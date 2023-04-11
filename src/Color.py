@@ -13,6 +13,7 @@ class Color(Enum):
     WHITE=3
     RED=4
     GREEN=5
+    GOLD=6
 
 
     def __init__(self, params):

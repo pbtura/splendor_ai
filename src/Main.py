@@ -22,7 +22,15 @@ if __name__ == "__main__":
     print ("Hello, world!")
     print("resource card is", card)
     print("noble card is", noble)
-    print("token store is", store)
-    print("player is", player1)
+    print("original token store is", store)
+
     
+    '''update the token store'''
+    result = store.updateTokens({Color.BLACK: 3, Color.RED: 1, Color.GREEN: 2})
+    if(result):
+        print("updated token store is", store)
+    else:
+        print("token update failed")
+    
+    print("player is", player1)
     '''update the player data'''
