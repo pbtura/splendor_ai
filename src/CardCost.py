@@ -4,7 +4,7 @@ Created on Apr 11, 2023
 @author: pbuchheit
 '''
 from Cost import Cost
-class GemCost(Cost):
+class CardCost(Cost):
     '''
     classdocs
     '''
