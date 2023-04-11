@@ -29,7 +29,7 @@ class TokenStore(object):
         
     def validate(self, old, new)->bool:
 
-        if(old - new < 0):
+        if(old + new < 0):
             raise ValueError("Cannot remove more gems than are in the store") 
             return 0
         else:
