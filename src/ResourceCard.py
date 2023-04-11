@@ -22,4 +22,4 @@ class ResourceCard(object):
         self.points = points
     
     def __str__(self)->str:
-        return f"Card is level {self.level}, color:{self.suit.name}, cost:{self.cost}, points:{self.points}"
+        return f"level {self.level}, color:{self.suit.name}, cost:{self.cost}, points:{self.points}"
