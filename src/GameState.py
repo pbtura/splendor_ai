@@ -23,14 +23,9 @@ class GameState(object):
     availableGems:TokenStore
     availableNobles:Iterable[NobleCard]
     
-    availableResources1:Iterable[ResourceCard]
-    resourceDeck1:Iterable[ResourceCard]
-    
-    availableResources2:Iterable[ResourceCard]
-    resourceDeck2:Iterable[ResourceCard]
-    
-    availableResources3:Iterable[ResourceCard]
-    resourceDeck3:Iterable[ResourceCard]
+    availableResources:dict[ResourceCard]
+    resourceDeck:dict[ResourceCard]
+
     
     def __init__(self, numberOfPlayers: int, currentRound: int=0):
         '''
@@ -38,8 +33,24 @@ class GameState(object):
         '''
     def initializeResourceDecks(self):  
         
+        self.resourceDeck = {}
         with open(os.path.join('..','resources','cards_list.csv'), newline='') as f:
             reader = csv.DictReader(f)
+            self.resourceDeck = GameState.importResourceDecks(reader)
+    
+    @staticmethod        
+    def initializeAvailableGems( numberOfPlayers: int)->TokenStore:
+        match numberOfPlayers:
+            case 4:
+                 availableGems = TokenStore(7,7,7,7,7,5)
+            case 3:
+                 availableGems = TokenStore(5,5,5,5,5,5)
+            case 2:
+                 availableGems = TokenStore(4,4,4,4,4,5)
+            case _:
+                availableGems = None
+       
+        return availableGems
     
     @staticmethod
     def parseResourceRow(rowData: Iterable)->ResourceCard:

@@ -11,6 +11,7 @@ from ResourceCard import ResourceCard
 from GameState import GameState
 from Color import Color
 from Cost import Cost
+from TokenStore import TokenStore
 
 
 class TestGameState(unittest.TestCase):
@@ -28,13 +29,8 @@ class TestGameState(unittest.TestCase):
         self.assertEqual(expected.points, actual.points)
         self.assertEqual(expected.suit, actual.suit)
         self.assertEqual(expected.cost, actual.cost)
-    
-    def testImportResourceDecks(self):
-        decks: dict = None
-        with open(os.path.join('..','resources','cards_list.csv'), newline='') as f:
-            reader = csv.DictReader(f)
-            decks = GameState.importResourceDecks(reader)
         
+    def assertResourceDeckInitialized(self,  decks: dict):
         self.assertIsNotNone(decks)
         self.assertEqual(40, len(decks.get(1)))
         self.assertEqual(30, len(decks.get(2)))
@@ -49,6 +45,14 @@ class TestGameState(unittest.TestCase):
         
         for card in decks.get(3):
             self.assertEqual(3, card.level)
+    
+    def testImportResourceDecks(self):
+        decks: dict = None
+        with open(os.path.join('..','resources','cards_list.csv'), newline='') as f:
+            reader = csv.DictReader(f)
+            decks = GameState.importResourceDecks(reader)
+        
+        self.assertResourceDeckInitialized(decks)
             
         pass
     
@@ -61,6 +65,49 @@ class TestGameState(unittest.TestCase):
         actualCard:ResourceCard = GameState.parseResourceRow(rowData)
         self.assertIsNotNone(actualCard)
         self.assertResourceCardsEqual(expectedCard, actualCard);
+        pass
+    
+    def testInitializeResourceDeck(self):
+        game: GameState = GameState(2)
+        game.initializeResourceDecks()
+        
+        self.assertResourceDeckInitialized(game.resourceDeck)
+        pass
+    
+    def testInitializeAvailableGemsForTwoPlayers(self):
+        
+        gems: TokenStore = GameState.initializeAvailableGems(2)
+        
+        self.assertEqual(4, gems.tokens[Color.WHITE])
+        self.assertEqual(4, gems.tokens[Color.BLUE])
+        self.assertEqual(4, gems.tokens[Color.GREEN])
+        self.assertEqual(4, gems.tokens[Color.RED])
+        self.assertEqual(4, gems.tokens[Color.BLACK])
+        self.assertEqual(5, gems.tokens[Color.GOLD])
+        pass
+    
+    def testInitializeAvailableGemsForThreePlayers(self):
+        
+        gems: TokenStore = GameState.initializeAvailableGems(3)
+        
+        self.assertEqual(5, gems.tokens[Color.WHITE])
+        self.assertEqual(5, gems.tokens[Color.BLUE])
+        self.assertEqual(5, gems.tokens[Color.GREEN])
+        self.assertEqual(5, gems.tokens[Color.RED])
+        self.assertEqual(5, gems.tokens[Color.BLACK])
+        self.assertEqual(5, gems.tokens[Color.GOLD])
+        pass
+    
+    def testInitializeAvailableGemsForFourPlayers(self):
+        
+        gems: TokenStore = GameState.initializeAvailableGems(4)
+        
+        self.assertEqual(7, gems.tokens[Color.WHITE])
+        self.assertEqual(7, gems.tokens[Color.BLUE])
+        self.assertEqual(7, gems.tokens[Color.GREEN])
+        self.assertEqual(7, gems.tokens[Color.RED])
+        self.assertEqual(7, gems.tokens[Color.BLACK])
+        self.assertEqual(5, gems.tokens[Color.GOLD])
         pass
 
 if __name__ == "__main__":
