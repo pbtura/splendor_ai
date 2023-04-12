@@ -21,24 +21,24 @@ class Test(unittest.TestCase):
 
 
     def testAddGreen(self):
-        #(blue, black, white, red, green, gold)
-        expected = TokenStore(7,6,5,4,5,2)
+        #(white, blue, green, red, black, gold)
+        expected = TokenStore(7,6,7,4,3,2)
         self.store.updateTokens({ Color.GREEN: 2})
         unittest.TestCase.assertDictEqual(self, expected.tokens, self.store.tokens)
         pass
 
     def testRemoveGreen(self):
-        #(blue, black, white, red, green, gold)
+        #(white, blue, green, red, black, gold)
 
-        expected = TokenStore(7,6,5,4,0,2)
+        expected = TokenStore(7,6,2,4,3,2)
         self.store.updateTokens({ Color.GREEN: -3})
         unittest.TestCase.assertDictEqual(self, expected.tokens, self.store.tokens)
         pass
     
     def testAddBlueAndGreen(self):
-        #(blue, black, white, red, green, gold)
-        expected = TokenStore(8,6,5,4,5,2)
-        self.store.updateTokens({ Color.BLUE: 1, Color.GREEN: 2})
+        #(white, blue, green, red, black, gold)
+        expected = TokenStore(7,10,8,4,3,2)
+        self.store.updateTokens({ Color.BLUE: 4, Color.GREEN: 3})
         unittest.TestCase.assertDictEqual(self, expected.tokens, self.store.tokens)
         pass
     

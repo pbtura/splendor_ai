@@ -12,7 +12,7 @@ class TokenStore(object):
 
     tokens:Dict[str, int]
     
-    def __init__(self, blue: int, black: int, white: int, red: int, green: int, gold: int):
+    def __init__(self, white: int, blue: int, green: int, red: int, black: int, gold: int):
         '''
         Constructor
         '''

@@ -9,7 +9,7 @@ class Cost(object):
     classdocs
     '''
 
-    def __init__(self, blue: int, black: int, white: int, red: int, green: int):
+    def __init__(self, white: int, blue: int, green: int, red: int, black: int,):
             '''
             Constructor
             '''
@@ -20,4 +20,4 @@ class Cost(object):
             self.green = green
         
     def __str__(self)->str:
-        return f"U:{self.blue}, B:{self.black}, W:{self.white}, R:{self.red}, G:{self.green}"
+        return f"W:{self.white}, U:{self.blue}, , G:{self.green}, R:{self.red}, B:{self.black}"

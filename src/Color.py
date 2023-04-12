@@ -8,11 +8,11 @@ class Color(Enum):
     '''
     classdocs
     '''
-    BLUE=1
-    BLACK=2
-    WHITE=3
+    WHITE=1
+    BLUE=2
+    GREEN=3
     RED=4
-    GREEN=5
+    BLACK=5
     GOLD=6
 
 

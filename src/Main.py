@@ -10,6 +10,7 @@ from CardCost import CardCost
 from NobleCard import NobleCard
 from TokenStore import TokenStore
 from Player import Player
+from GameState import GameState
 
 if __name__ == "__main__":
     foo = GemCost(0,1,2,3,4)
@@ -34,3 +35,7 @@ if __name__ == "__main__":
     
     print("player is", player1)
     '''update the player data'''
+    
+    '''initialize a game'''
+    game = GameState(2)
+    game.importDeck()
