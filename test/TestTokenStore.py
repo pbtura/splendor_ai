@@ -7,7 +7,7 @@ import unittest
 from TokenStore import TokenStore 
 from Color import Color 
 
-class Test(unittest.TestCase):
+class TestTokenStore(unittest.TestCase):
 
     store:TokenStore
     

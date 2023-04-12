@@ -16,10 +16,10 @@ class ResourceCard(object):
         '''
         Constructor
         '''
-        self.level = level
+        self.level = int(level)
         self.suit = suit
         self.cost = cost
-        self.points = points
+        self.points = int(points)
     
     def __str__(self)->str:
         return f"level {self.level}, color:{self.suit.name}, cost:{self.cost}, points:{self.points}"

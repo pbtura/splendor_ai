@@ -6,10 +6,13 @@ Created on Apr 11, 2023
 import os
 import csv
 import Player
+
+from Cost import Cost
 from _collections_abc import Iterable
 from TokenStore import TokenStore
 from NobleCard import NobleCard
 from ResourceCard import ResourceCard
+from Color import Color
 class GameState(object):
     '''
     classdocs
@@ -33,31 +36,36 @@ class GameState(object):
         '''
         Constructor
         '''
-        self.resourceDeck1 = [];
-        self.resourceDeck2 = [];
-        self.resourceDeck3 = [];
+    def initializeResourceDecks(self):  
+        
+        with open(os.path.join('..','resources','cards_list.csv'), newline='') as f:
+            reader = csv.DictReader(f)
     
     @staticmethod
-    def parseResourceRow(row: Iterable)->ResourceCard:                
-        card = ResourceCard;
-        return None;
-    
-    def importDeck(self):       
-        with open(os.path.join('..','resources','cards_list.csv'), newline='') as f:
-            reader = csv.reader(f)
-            currentDeck:Iterable[ResourceCard]
-            for row in reader:
-                print(row)
-                match(row[0]):
-                    case '1':
-                        currentDeck = self.resourceDeck1
-                    case '2':
-                        currentDeck = self.resourceDeck2
-                    case '3':
-                        currentDeck = self.resourceDeck3
-                    case _:
-                        #do nothing
-                        print('')
+    def parseResourceRow(rowData: Iterable)->ResourceCard:
+        row = dict(rowData)
+        colorName: str = row['Gem color']
+        color: Color = Color[colorName] 
+        cost: Cost = Cost(row['white'], row['blue'], row['green'], row['red'], row['black'])              
+        card = ResourceCard(row['Level'], color, cost, row['PV'])
+        
+        return card;
+
+    @staticmethod
+    def importResourceDecks(reader) -> dict:       
+        decks: dict = {1: [], 2: [], 3: []}
+
+
+        for row in reader:
+            #print(row)   
+            #make sure we filter out and headers or other unwanted lines               
+            level: int = int(row['Level']);
+
+            cardList: list = decks.get(level)
+            card: ResourceCard = GameState.parseResourceRow(row)
+            cardList.append(card)
+                
+        return decks
                 
     
                     
