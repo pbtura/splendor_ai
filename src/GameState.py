@@ -77,6 +77,19 @@ class GameState(object):
             cardList.append(card)
                 
         return decks
+    
+    @staticmethod
+    def parseNobleRow(rowData: Iterable)->NobleCard:
+        row = dict(rowData)
+        cost: Cost = Cost(row['white'], row['blue'], row['green'], row['red'], row['black'])              
+        card = NobleCard( cost, row['PV'])
+        
+        return card;
+    
+    @staticmethod
+    def importNobleDeck(reader) -> Iterable[NobleCard]:
+        nobles = []
+        return nobles
                 
     
                     

@@ -12,6 +12,7 @@ from GameState import GameState
 from Color import Color
 from Cost import Cost
 from TokenStore import TokenStore
+from NobleCard import NobleCard
 
 
 class TestGameState(unittest.TestCase):
@@ -29,6 +30,10 @@ class TestGameState(unittest.TestCase):
         self.assertEqual(expected.points, actual.points)
         self.assertEqual(expected.suit, actual.suit)
         self.assertEqual(expected.cost, actual.cost)
+    
+    def assertNobleCardsEqual(self,expected:NobleCard, actual:NobleCard):
+        self.assertEqual(expected.points, actual.points)
+        self.assertEqual(expected.cost, actual.cost)
         
     def assertResourceDeckInitialized(self,  decks: dict):
         self.assertIsNotNone(decks)
@@ -45,6 +50,10 @@ class TestGameState(unittest.TestCase):
         
         for card in decks.get(3):
             self.assertEqual(3, card.level)
+    
+    def assertNobleDeckInitialized(self, deck: Iterable[NobleCard]):
+        self.assertIsNotNone(deck)
+        self.assertEqual(10, len(deck))
     
     def testImportResourceDecks(self):
         decks: dict = None
@@ -108,6 +117,24 @@ class TestGameState(unittest.TestCase):
         self.assertEqual(7, gems.tokens[Color.RED])
         self.assertEqual(7, gems.tokens[Color.BLACK])
         self.assertEqual(5, gems.tokens[Color.GOLD])
+        pass
+    
+    def testParseNobleRow(self):
+        rowData: dict = {'PV':3, 'white':0,'blue':0,'green':4,'red':0,'black':4}
+        expectedCost:Cost = Cost( 0,0,4,0,4)
+        expectedCard:NobleCard = NobleCard( expectedCost, 3)
+        actualCard:NobleCard = GameState.parseNobleRow(rowData)
+        self.assertIsNotNone(actualCard)
+        self.assertNobleCardsEqual(expectedCard, actualCard);
+        pass
+    
+    def testImportNobleDeck(self):
+        decks: dict = None
+        with open(os.path.join('..','resources','nobles_list.csv'), newline='') as f:
+            reader = csv.DictReader(f)
+            decks = GameState.importNobleDeck(reader)
+        
+        self.assertNobleDeckInitialized(decks)            
         pass
 
 if __name__ == "__main__":

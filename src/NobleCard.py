@@ -9,15 +9,14 @@ class NobleCard(object):
     '''
     classdocs
     '''
-
-    POINTS: int = 3
     
-    def __init__(self, cost: CardCost):
+    def __init__(self, cost: CardCost, points: int):
         '''
         Constructor
         '''
         self.cost = cost
+        self.points = points
         
     def __str__(self)->str:
-        return f"cost:{self.cost}, points:{NobleCard.POINTS}"
+        return f"cost:{self.cost}, points:{self.points}"
         
