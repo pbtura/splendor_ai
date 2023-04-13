@@ -5,7 +5,6 @@ Created on Apr 11, 2023
 '''
 import os
 import csv
-import Player
 
 from Cost import Cost
 from _collections_abc import Iterable
@@ -13,6 +12,8 @@ from TokenStore import TokenStore
 from NobleCard import NobleCard
 from ResourceCard import ResourceCard
 from Color import Color
+from Player import Player
+
 class GameState(object):
     '''
     classdocs
@@ -99,7 +100,11 @@ class GameState(object):
             card: NobleCard = GameState.parseNobleRow(row)
             nobles.append(card)
         return nobles
-                
-    
+                    
+    def addPlayers(self, names:list[str]):
+        self.players = []
+        for name in names:
+            player:Player = Player(name)
+            self.players.append(player)
                     
         

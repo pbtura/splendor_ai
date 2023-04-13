@@ -18,17 +18,17 @@ class Player(object):
     reservedCards: Iterable[ResourceCard]
     nobles: Iterable[NobleCard]
     
-    def __init__(self, turnOrder: int, turnsTaken: int=0 ):
+    def __init__(self, playerName: str ):
         '''
         Constructor
         '''
-        self.turnOrder = turnOrder;
-        self.turnsTaken = turnsTaken;
+        self.turnsTaken = 0;
+        self.name = playerName;
         self.gems = TokenStore(0,0,0,0,0,0)
         self.cards = []
         self.reservedCards = []
         self.nobles = []
         
     def __str__(self)->str:
-        return f"turn order:{self.turnOrder}, turns taken:{self.turnsTaken}, gems:{self.gems}, resources:{self.cards}, reserved cards:{self.reservedCards}, nobles:{self.nobles}"
+        return f"turns taken:{self.turnsTaken}, gems:{self.gems}, resources:{self.cards}, reserved cards:{self.reservedCards}, nobles:{self.nobles}"
         

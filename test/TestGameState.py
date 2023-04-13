@@ -13,6 +13,7 @@ from Color import Color
 from Cost import Cost
 from TokenStore import TokenStore
 from NobleCard import NobleCard
+from Player import Player
 
 
 class TestGameState(unittest.TestCase):
@@ -142,6 +143,18 @@ class TestGameState(unittest.TestCase):
         game.initializeNobleDeck()
         
         self.assertNobleDeckInitialized(game.noblesDeck)
+        pass
+    
+    def testAddPlayers(self):
+        game: GameState = GameState(2)
+        playerNames = ["playerA", "playerB"]
+        game.addPlayers(playerNames)
+        self.assertIsNotNone(game.players)
+        self.assertEqual(2, len(game.players))
+        
+        player:Player
+        for index, player in enumerate(game.players):
+            self.assertEqual(playerNames[index], player.name)
         pass
 
 if __name__ == "__main__":
