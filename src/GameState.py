@@ -68,8 +68,7 @@ class GameState(object):
 
 
         for row in reader:
-            #print(row)   
-            #make sure we filter out and headers or other unwanted lines               
+            #print(row)               
             level: int = int(row['Level']);
 
             cardList: list = decks.get(level)
@@ -89,6 +88,9 @@ class GameState(object):
     @staticmethod
     def importNobleDeck(reader) -> Iterable[NobleCard]:
         nobles = []
+        for row in reader:
+            card: NobleCard = GameState.parseNobleRow(row)
+            nobles.append(card)
         return nobles
                 
     
