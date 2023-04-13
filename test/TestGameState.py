@@ -136,6 +136,13 @@ class TestGameState(unittest.TestCase):
         
         self.assertNobleDeckInitialized(decks)            
         pass
+    
+    def testInitializeNobleDeck(self):
+        game: GameState = GameState(2)
+        game.initializeNobleDeck()
+        
+        self.assertNobleDeckInitialized(game.noblesDeck)
+        pass
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testParseResourceRow']

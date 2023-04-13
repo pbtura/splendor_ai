@@ -22,6 +22,7 @@ class GameState(object):
     players: Iterable[Player]
     availableGems:TokenStore
     availableNobles:Iterable[NobleCard]
+    noblesDeck:Iterable[NobleCard]
     
     availableResources:dict[ResourceCard]
     resourceDeck:dict[ResourceCard]
@@ -37,6 +38,12 @@ class GameState(object):
         with open(os.path.join('..','resources','cards_list.csv'), newline='') as f:
             reader = csv.DictReader(f)
             self.resourceDeck = GameState.importResourceDecks(reader)
+    
+    def initializeNobleDeck(self):
+        self.noblesDeck = []
+        with open(os.path.join('..','resources','nobles_list.csv'), newline='') as f:
+            reader = csv.DictReader(f)
+            self.noblesDeck = GameState.importNobleDeck(reader)
     
     @staticmethod        
     def initializeAvailableGems( numberOfPlayers: int)->TokenStore:
