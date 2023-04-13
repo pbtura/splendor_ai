@@ -5,6 +5,8 @@ Created on Apr 11, 2023
 '''
 import os
 import csv
+import random
+from collections import deque
 
 from Cost import Cost
 from _collections_abc import Iterable
@@ -25,14 +27,39 @@ class GameState(object):
     availableNobles:Iterable[NobleCard]
     noblesDeck:Iterable[NobleCard]
     
-    availableResources:dict[ResourceCard]
-    resourceDeck:dict[ResourceCard]
+    availableResources:dict[int,list[ResourceCard]]
+    resourceDeck:dict[int, deque[ResourceCard]]
 
     
-    def __init__(self, numberOfPlayers: int, currentRound: int=0):
+    def __init__(self):
         '''
         Constructor
         '''
+        self.availableResources = {1: [], 2: [], 3: []}
+    
+    def setupGame(self, names:list[str]):
+        #initialize players
+        #initialize resource deck
+        #initialize noble deck
+        #initialize token bank
+        self.addPlayers(names)    
+    
+    def startNewGame(self):   
+                
+        #randomize turn order
+        #randomize resource deck
+        #randomize noble deck
+        
+        #deal resource cards
+        #deal noble cards 
+        random.shuffle(self.players)
+        
+    def addPlayers(self, names:list[str]):
+        self.players = []
+        for name in names:
+            player:Player = Player(name)
+            self.players.append(player)
+                
     def initializeResourceDecks(self):  
         
         self.resourceDeck = {}
@@ -45,6 +72,22 @@ class GameState(object):
         with open(os.path.join('..','resources','nobles_list.csv'), newline='') as f:
             reader = csv.DictReader(f)
             self.noblesDeck = GameState.importNobleDeck(reader)
+    
+    def dealResourceCards(self, level: int, numberOfCards: int):
+        available:list = self.availableResources.get(level)
+
+        i: int = 0;
+        cards: deque = self.resourceDeck.get(level)
+        while i < numberOfCards and len(cards) > 0 :          
+            available.append( cards.popleft())
+            i+=1
+        
+    def initializeAvailableResourceCards(self):
+                
+        self.dealResourceCards(1, 4)
+        self.dealResourceCards(2, 4)
+        self.dealResourceCards(3, 4)
+        
     
     @staticmethod        
     def initializeAvailableGems( numberOfPlayers: int)->TokenStore:
@@ -72,14 +115,14 @@ class GameState(object):
 
     @staticmethod
     def importResourceDecks(reader) -> dict:       
-        decks: dict = {1: [], 2: [], 3: []}
+        decks: dict = {1: deque(), 2: deque(), 3: deque()}
 
 
         for row in reader:
             #print(row)               
             level: int = int(row['Level']);
 
-            cardList: list = decks.get(level)
+            cardList: deque = decks.get(level)
             card: ResourceCard = GameState.parseResourceRow(row)
             cardList.append(card)
                 
@@ -101,10 +144,5 @@ class GameState(object):
             nobles.append(card)
         return nobles
                     
-    def addPlayers(self, names:list[str]):
-        self.players = []
-        for name in names:
-            player:Player = Player(name)
-            self.players.append(player)
                     
         

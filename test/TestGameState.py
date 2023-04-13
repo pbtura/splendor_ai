@@ -78,7 +78,7 @@ class TestGameState(unittest.TestCase):
         pass
     
     def testInitializeResourceDeck(self):
-        game: GameState = GameState(2)
+        game: GameState = GameState()
         game.initializeResourceDecks()
         
         self.assertResourceDeckInitialized(game.resourceDeck)
@@ -139,14 +139,14 @@ class TestGameState(unittest.TestCase):
         pass
     
     def testInitializeNobleDeck(self):
-        game: GameState = GameState(2)
+        game: GameState = GameState()
         game.initializeNobleDeck()
         
         self.assertNobleDeckInitialized(game.noblesDeck)
         pass
     
     def testAddPlayers(self):
-        game: GameState = GameState(2)
+        game: GameState = GameState()
         playerNames = ["playerA", "playerB"]
         game.addPlayers(playerNames)
         self.assertIsNotNone(game.players)
@@ -155,6 +155,62 @@ class TestGameState(unittest.TestCase):
         player:Player
         for index, player in enumerate(game.players):
             self.assertEqual(playerNames[index], player.name)
+        pass
+    
+    def testDealResourceCards(self):
+        
+        game: GameState = GameState()
+        game.initializeResourceDecks()
+        deck1: list[ResourceCard] = game.resourceDeck.get(1)
+        expected1: list[ResourceCard] = [deck1[0], deck1[1], deck1[2], deck1[3]]
+        
+        game.dealResourceCards(1, 4)
+        #we want to test that the top 4 cards 
+        #have been moved to the availableResources deck
+        self.assertEqual(36, len(game.resourceDeck.get(1)))
+        actualDeck1:list = game.availableResources.get(1)
+        self.assertEquals(4, len(actualDeck1))
+        for idx, card in enumerate(actualDeck1):
+            self.assertResourceCardsEqual(expected1[idx], card)
+            
+        pass
+    
+    def testInitializeAvailableResourceCards(self):
+        game: GameState = GameState()
+        game.initializeResourceDecks()
+        deck1: list[ResourceCard] = game.resourceDeck.get(1)
+        deck2: list[ResourceCard] = game.resourceDeck.get(2)
+        deck3: list[ResourceCard] = game.resourceDeck.get(3)
+        
+        expected1: list[ResourceCard] = [deck1[0], deck1[1], deck1[2], deck1[3]]
+        expected2: list[ResourceCard] = [deck2[0], deck2[1], deck2[2], deck2[3]]
+        expected3: list[ResourceCard] = [deck3[0], deck3[1], deck3[2], deck3[3]]
+        
+        game.initializeAvailableResourceCards()
+        
+        #we want to test that the top 4 cards 
+        #have been moved to the availableResources deck
+        self.assertEqual(36, len(game.resourceDeck.get(1)))
+        self.assertEqual(26, len(game.resourceDeck.get(2)))
+        self.assertEqual(16, len(game.resourceDeck.get(3)))
+        
+        actualDeck1:list = game.availableResources.get(1)
+        actualDeck2:list = game.availableResources.get(2)
+        actualDeck3:list = game.availableResources.get(3)
+        
+        self.assertEquals(4, len(actualDeck1))
+        self.assertEquals(4, len(actualDeck2))
+        self.assertEquals(4, len(actualDeck3))
+        
+        for idx, card in enumerate(actualDeck1):
+            self.assertResourceCardsEqual(expected1[idx], card)
+            
+        for idx, card in enumerate(actualDeck2):
+            self.assertResourceCardsEqual(expected2[idx], card)
+            
+        for idx, card in enumerate(actualDeck3):
+            self.assertResourceCardsEqual(expected3[idx], card)
+        
         pass
 
 if __name__ == "__main__":
