@@ -175,6 +175,30 @@ class TestGameState(unittest.TestCase):
             
         pass
     
+    def testDealNobleCards(self):
+        game: GameState = GameState()
+        game.initializeNobleDeck()
+        game.dealNobleCards(4);
+        
+        self.assertEqual(5,len(game.availableNobles))
+        pass
+    
+    def testDealNobleCardsForThreePlayers(self):
+        game: GameState = GameState()
+        game.initializeNobleDeck()
+        game.dealNobleCards(3);
+        
+        self.assertEqual(4,len(game.availableNobles))
+        pass
+    
+    def testDealNobleCardsForTwoPlayers(self):
+        game: GameState = GameState()
+        game.initializeNobleDeck()
+        game.dealNobleCards(2);
+        
+        self.assertEqual(3,len(game.availableNobles))
+        pass
+    
     def testInitializeAvailableResourceCards(self):
         game: GameState = GameState()
         game.initializeResourceDecks()

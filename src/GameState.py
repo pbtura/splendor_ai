@@ -15,6 +15,7 @@ from NobleCard import NobleCard
 from ResourceCard import ResourceCard
 from Color import Color
 from Player import Player
+from ast import Num
 
 class GameState(object):
     '''
@@ -25,7 +26,7 @@ class GameState(object):
     players: Iterable[Player]
     availableGems:TokenStore
     availableNobles:Iterable[NobleCard]
-    noblesDeck:Iterable[NobleCard]
+    noblesDeck:deque[NobleCard]
     
     availableResources:dict[int,list[ResourceCard]]
     resourceDeck:dict[int, deque[ResourceCard]]
@@ -80,6 +81,15 @@ class GameState(object):
         cards: deque = self.resourceDeck.get(level)
         while i < numberOfCards and len(cards) > 0 :          
             available.append( cards.popleft())
+            i+=1
+    
+    def dealNobleCards(self, numberOfPlayers: int):
+        self.availableNobles = []
+        
+        i: int = 0;
+        cards: deque = self.noblesDeck
+        while i < numberOfPlayers + 1 and len(cards) > 0 :          
+            self.availableNobles.append( cards.popleft())
             i+=1
         
     def initializeAvailableResourceCards(self):
@@ -138,7 +148,7 @@ class GameState(object):
     
     @staticmethod
     def importNobleDeck(reader) -> Iterable[NobleCard]:
-        nobles = []
+        nobles: deque = deque()
         for row in reader:
             card: NobleCard = GameState.parseNobleRow(row)
             nobles.append(card)
