@@ -40,6 +40,7 @@ class GameState(object):
         Constructor
         '''
         self.availableResources = {1: [], 2: [], 3: []}
+        self.noblesDeck = deque()
     
     def setupGame(self, names:list[str]):
         #initialize players
