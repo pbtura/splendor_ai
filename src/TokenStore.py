@@ -20,17 +20,32 @@ class TokenStore(object):
     
     def updateTokens(self, tokens:Dict[str, int])-> bool:
         for x,y in tokens.items():
-            if ( self.validate(self.tokens[x], y) ):
-                self.tokens[x] += y
+            self.tokens[x] += y
+    
+        return 1   
+    
+    def withdrawTokens(self, tokens:Dict[str, int])-> bool:
+        for x,y in tokens.items():
+            if(y>=2):
+                self.validateWithdrawPair()
+            elif( self.validateWithdraw(self.tokens[x], y) ):
+                self.tokens[x] -= y
             else:
                 return 0
     
-        return 1                
+        return 1               
         
-    def validate(self, old, new)->bool:
+    def validateWithdrawPair(self, color: Color)-> bool:
+        if(self.tokens.get(color) < 4):
+            raise RuntimeError("Cannot withdraw two matched gems when less than four remain.")
+            return 0
+        else:
+            return 1
+        
+    def validateWithdraw(self, old, new)->bool:
 
-        if(old + new < 0):
-            raise ValueError("Cannot remove more gems than are in the store") 
+        if(old - new < 0):
+            raise RuntimeError("Cannot remove more gems than are in the store") 
             return 0
         else:
             return 1

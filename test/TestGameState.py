@@ -6,17 +6,17 @@ Created on Apr 12, 2023
 import unittest
 import os
 import csv
-from _collections_abc import Iterable
 from ResourceCard import ResourceCard
 from GameState import GameState
 from Color import Color
 from Cost import Cost
-from TokenStore import TokenStore
 from NobleCard import NobleCard
 from Player import Player
+from TestGame import TestGame
+from TokenStore import TokenStore
 
 
-class TestGameState(unittest.TestCase):
+class TestGameState(TestGame):
 
 
     def setUp(self):
@@ -35,51 +35,7 @@ class TestGameState(unittest.TestCase):
     def assertNobleCardsEqual(self,expected:NobleCard, actual:NobleCard):
         self.assertEqual(expected.points, actual.points)
         self.assertEqual(expected.cost, actual.cost)
-        
-    def assertResourceDeckInitialized(self,  decks: dict):
-        self.assertIsNotNone(decks)
-        self.assertEqual(40, len(decks.get(1)))
-        self.assertEqual(30, len(decks.get(2)))
-        self.assertEqual(20, len(decks.get(3)))
-        
-        card: ResourceCard
-        for card in decks.get(1):
-            self.assertEqual(1, card.level)
-        
-        for card in decks.get(2):
-            self.assertEqual(2, card.level)
-        
-        for card in decks.get(3):
-            self.assertEqual(3, card.level)
-    
-    def assertNobleDeckInitialized(self, deck: Iterable[NobleCard]):
-        self.assertIsNotNone(deck)
-        self.assertEqual(10, len(deck))
-        
-    def assertAvailableGemsInitialized(self, gems: TokenStore):
-        self.assertEqual(7, gems.tokens[Color.WHITE])
-        self.assertEqual(7, gems.tokens[Color.BLUE])
-        self.assertEqual(7, gems.tokens[Color.GREEN])
-        self.assertEqual(7, gems.tokens[Color.RED])
-        self.assertEqual(7, gems.tokens[Color.BLACK])
-        self.assertEqual(5, gems.tokens[Color.GOLD])
-        
-    def assertAvailableGemsInitializedForThreePlayers(self, gems: TokenStore):
-        self.assertEqual(5, gems.tokens[Color.WHITE])
-        self.assertEqual(5, gems.tokens[Color.BLUE])
-        self.assertEqual(5, gems.tokens[Color.GREEN])
-        self.assertEqual(5, gems.tokens[Color.RED])
-        self.assertEqual(5, gems.tokens[Color.BLACK])
-        self.assertEqual(5, gems.tokens[Color.GOLD])
-    
-    def assertAvailableGemsInitializedForTwoPlayers(self, gems: TokenStore):
-        self.assertEqual(4, gems.tokens[Color.WHITE])
-        self.assertEqual(4, gems.tokens[Color.BLUE])
-        self.assertEqual(4, gems.tokens[Color.GREEN])
-        self.assertEqual(4, gems.tokens[Color.RED])
-        self.assertEqual(4, gems.tokens[Color.BLACK])
-        self.assertEqual(5, gems.tokens[Color.GOLD])
-    
+ 
     def testImportResourceDecks(self):
         decks: dict = None
         with open(os.path.join('..','resources','cards_list.csv'), newline='') as f:
@@ -216,29 +172,7 @@ class TestGameState(unittest.TestCase):
         self.assertEqual(7, len(game.noblesDeck))
         self.assertEqual(3,len(game.availableNobles))
         pass
-    
-    def assertAvailableResourcesDealt(self, resourceDeck: dict, expected1: list[ResourceCard], expected2: list[ResourceCard], expected3: list[ResourceCard], actualDeck1, actualDeck2, actualDeck3, shuffled: bool = 0):
-        #we want to test that the top 4 cards 
-        #have been moved to the availableResources deck
-        self.assertEqual(36, len(resourceDeck.get(1)))
-        self.assertEqual(26, len(resourceDeck.get(2)))
-        self.assertEqual(16, len(resourceDeck.get(3)))
-                     
-        self.assertEquals(4, len(actualDeck1))
-        self.assertEquals(4, len(actualDeck2))
-        self.assertEquals(4, len(actualDeck3))
-        
-        #if the deck has been randomized, we don't want to do the equality check
-        if not shuffled:
-            for idx, card in enumerate(actualDeck1):
-                self.assertResourceCardsEqual(expected1[idx], card)
-                
-            for idx, card in enumerate(actualDeck2):
-                self.assertResourceCardsEqual(expected2[idx], card)
-                
-            for idx, card in enumerate(actualDeck3):
-                self.assertResourceCardsEqual(expected3[idx], card)
-    
+       
     def testInitializeAvailableResourceCards(self):
         game: GameState = GameState()
         game.initializeResourceDecks()
@@ -255,7 +189,7 @@ class TestGameState(unittest.TestCase):
         actualDeck1:list = game.availableResources.get(1)
         actualDeck2:list = game.availableResources.get(2)
         actualDeck3:list = game.availableResources.get(3)
-        self.assertAvailableResourcesDealt(game.resourceDeck, expected1, expected2, expected3, actualDeck1, actualDeck2, actualDeck3)
+        self.assertAvailableResourcesDealt(game.resourceDeck, actualDeck1, actualDeck2, actualDeck3, 0, expected1, expected2, expected3)
         
         pass
 
@@ -283,13 +217,6 @@ class TestGameState(unittest.TestCase):
         names: list = ["playerA", "playerB", "playerC", "playerD"]
         game: GameState = GameState()
         game.setupGame(names)
-
-        deck1: list[ResourceCard] = game.resourceDeck.get(1)
-        deck2: list[ResourceCard] = game.resourceDeck.get(2)
-        deck3: list[ResourceCard] = game.resourceDeck.get(3)
-        expected1: list[ResourceCard] = [deck1[0], deck1[1], deck1[2], deck1[3]]
-        expected2: list[ResourceCard] = [deck2[0], deck2[1], deck2[2], deck2[3]]
-        expected3: list[ResourceCard] = [deck3[0], deck3[1], deck3[2], deck3[3]]
         
         game.startNewGame(1)
         
@@ -304,13 +231,129 @@ class TestGameState(unittest.TestCase):
         actualDeck1:list = game.availableResources.get(1)
         actualDeck2:list = game.availableResources.get(2)
         actualDeck3:list = game.availableResources.get(3)
-        self.assertAvailableResourcesDealt(game.resourceDeck, expected1, expected2, expected3, actualDeck1, actualDeck2, actualDeck3, 1)
+        self.assertAvailableResourcesDealt(game.resourceDeck, actualDeck1, actualDeck2, actualDeck3, 1)
         
         #check deal noble cards 
         self.assertEqual(5, len(game.noblesDeck))
         self.assertEqual(5,len(game.availableNobles))
         
         pass
+    
+    def createGame(self) -> GameState:
+        names: list = ["playerA", "playerB", "playerC", "playerD"]
+        game: GameState = GameState()
+        game.setupGame(names)
+        game.startNewGame(0)
+        
+        return game
+    
+    def testWithdrawGems(self):
+        
+        game: GameState = self.createGame()
+        player: Player = game.players[0]
+
+        #(white, blue, green, red, black)
+        expectedCost:dict = {Color.BLUE: 1, Color.RED: 1, Color.BLACK: 1}
+        
+        game.withdrawGems(player, expectedCost)
+        actualPlayer = game.players[0]
+        
+        for x in expectedCost.keys():
+            #check that the gems were withdrawn from the game store
+            self.assertEquals( 6, game.availableGems.tokens.get(x))
+            
+            #check that the gems were added to the player store
+            self.assertEqual(1, actualPlayer.gems.tokens.get(x))
+        
+              
+        pass
+    
+    def testWithdrawGemPair(self):
+        game: GameState = self.createGame()
+        player: Player = game.players[0]
+
+        #(white, blue, green, red, black)
+        expectedCost:dict = {Color.BLUE: 2}
+        
+        game.withdrawGems(player, expectedCost)
+        actualPlayer = game.players[0]
+        
+        for x in expectedCost.keys():
+            #check that the gems were withdrawn from the game store
+            self.assertEquals( 5, game.availableGems.tokens.get(x))
+            
+            #check that the gems were added to the player store
+            self.assertEqual(2, actualPlayer.gems.tokens.get(x))
+        
+              
+        pass
+        
+    def testWitdrawTooManyGems(self):
+        game: GameState = self.createGame()
+        player: Player = game.players[0]
+
+        #(white, blue, green, red, black)
+        expectedCost:dict = {Color.WHITE: 1, Color.BLUE: 1, Color.RED: 1, Color.BLACK: 1}              
+        
+        with self.assertRaises(RuntimeError) as context:
+            game.withdrawGems(player, expectedCost)
+        self.assertEqual("No more than three gems may be withdrawn from the bank.", str(context.exception))             
+    
+    def testWithdrawMoreGemsThanAvailable(self):
+        game: GameState = self.createGame()
+        player: Player = game.players[0]
+
+        #(white, blue, green, red, black)
+        expectedCost:dict = {Color.WHITE: 1}
+        
+        #withdraw gems until there are no white remaining
+        i: int = 0
+        while i < 6:
+            game.withdrawGems(player, expectedCost)
+            i=+1
+        
+        with self.assertRaises(RuntimeError) as context:
+            game.withdrawGems(player, expectedCost)
+        self.assertEqual("Cannot remove more gems than are in the store", str(context.exception))   
+        
+    def testWithdrawInvalidGemPair(self):
+        game: GameState = self.createGame()
+        player: Player = game.players[0]
+
+        #(white, blue, green, red, black)
+        expectedCost:dict = {Color.WHITE: 1}
+        
+        #withdraw gems until there are no white remaining
+        i: int = 0
+        while i < 3:
+            game.withdrawGems(player, expectedCost)
+            i=+1
+        
+        with self.assertRaises(RuntimeError) as context:
+            game.withdrawGems(player, expectedCost)
+        self.assertEqual("Cannot withdraw two matched gems when less than four remain.", str(context.exception))
+    
+    def testPurchaseCard(self):
+        
+        # game: GameState = self.createGame()
+        # player: Player = game.players[0]
+        #
+        # deckKey: int = 1
+        # cardIdx: int = 0
+        # expected: ResourceCard = game.availableResources.get(deckKey)[cardIdx]
+        # expectedCost:Cost = expected.cost
+        
+        self.fail("not implemented")
+    
+    def testPurchaseCardWithInsufficientGems(self):
+        self.fail("not implemented")
+    
+    def testReserveCard(self):
+        self.fail("not implemented")
+    
+    def testClaimNoble(self):
+        self.fail("not implemented")
+        
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testParseResourceRow']

@@ -15,7 +15,6 @@ from NobleCard import NobleCard
 from ResourceCard import ResourceCard
 from Color import Color
 from Player import Player
-from ast import Num
 
 class GameState(object):
     '''
@@ -178,6 +177,22 @@ class GameState(object):
             card: NobleCard = GameState.parseNobleRow(row)
             nobles.append(card)
         return nobles
-                    
+    
+    def withdrawGems(self, player:Player, gems: dict):
+        
+        if(len(gems) > 3):
+            raise RuntimeError("No more than three gems may be withdrawn from the bank.")
+
+        self.availableGems.withdrawTokens(gems);
+        player.gems.updateTokens(gems)       
+    
+    def purchaseCard(self, player:Player, deck: int, card: int):     
+        print("purchasing card") 
+        
+    def reserveCard(self, player:Player, deck: int, card: int):    
+        print("reserving card")  
+        
+    def claimNoble(self, player:Player, card: int):
+        print("claiming noble")
                     
         

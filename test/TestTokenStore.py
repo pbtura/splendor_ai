@@ -31,7 +31,7 @@ class TestTokenStore(unittest.TestCase):
         #(white, blue, green, red, black, gold)
 
         expected = TokenStore(7,6,2,4,3,2)
-        self.store.updateTokens({ Color.GREEN: -3})
+        self.store.withdrawTokens({ Color.GREEN: 3})
         unittest.TestCase.assertDictEqual(self, expected.tokens, self.store.tokens)
         pass
     
@@ -44,7 +44,7 @@ class TestTokenStore(unittest.TestCase):
     
     def testRemoveTooMany(self):
         
-        unittest.TestCase.assertRaises(self, ValueError, self.store.updateTokens, { Color.GREEN: -6})
+        unittest.TestCase.assertRaises(self, ValueError, self.store.withdrawTokens, { Color.GREEN: 6})
         pass
 
 if __name__ == "__main__":
