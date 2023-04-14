@@ -30,7 +30,10 @@ class GameState(object):
     
     availableResources:dict[int,list[ResourceCard]]
     resourceDeck:dict[int, deque[ResourceCard]]
-
+    
+    playersRandomized:bool = 0
+    resourcesShuffled:bool = 0
+    noblesShuffled:bool = 0
     
     def __init__(self):
         '''
@@ -49,15 +52,33 @@ class GameState(object):
         self.initializeAvailableGems()
            
     
-    def startNewGame(self):   
-                
-        #randomize turn order
-        #randomize resource deck
-        #randomize noble deck
+    def startNewGame(self, randomize:bool = 1):   
         
-        #deal resource cards
+        #this is primarily for testing purposes. During normal usage,
+        #randomize should always be true
+        if(randomize):
+            #randomize turn order
+            random.shuffle(self.players)
+            self.playersRandomized = 1          
+        
+            #randomize resource deck
+            for y in self.resourceDeck.values(): 
+                random.shuffle(y)
+            self.resourcesShuffled = 1
+            
+            #randomize noble deck
+            random.shuffle(self.noblesDeck)
+            self.noblesShuffled = 1
+        else:
+            self.playersRandomized = 0
+            self.resourcesShuffled = 0
+            self.noblesShuffled = 0
+        
+        #deal resource cards          
+        self.initializeAvailableResourceCards()
+        
         #deal noble cards 
-        random.shuffle(self.players)
+        self.dealNobleCards(len(self.players))       
         
     def addPlayers(self, names:list[str]):
         self.players = []

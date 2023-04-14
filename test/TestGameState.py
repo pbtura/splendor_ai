@@ -195,6 +195,7 @@ class TestGameState(unittest.TestCase):
         game.initializeNobleDeck()
         game.dealNobleCards(4);
         
+        self.assertEqual(5, len(game.noblesDeck))
         self.assertEqual(5,len(game.availableNobles))
         pass
     
@@ -203,6 +204,7 @@ class TestGameState(unittest.TestCase):
         game.initializeNobleDeck()
         game.dealNobleCards(3);
         
+        self.assertEqual(6, len(game.noblesDeck))
         self.assertEqual(4,len(game.availableNobles))
         pass
     
@@ -211,8 +213,31 @@ class TestGameState(unittest.TestCase):
         game.initializeNobleDeck()
         game.dealNobleCards(2);
         
+        self.assertEqual(7, len(game.noblesDeck))
         self.assertEqual(3,len(game.availableNobles))
         pass
+    
+    def assertAvailableResourcesDealt(self, resourceDeck: dict, expected1: list[ResourceCard], expected2: list[ResourceCard], expected3: list[ResourceCard], actualDeck1, actualDeck2, actualDeck3, shuffled: bool = 0):
+        #we want to test that the top 4 cards 
+        #have been moved to the availableResources deck
+        self.assertEqual(36, len(resourceDeck.get(1)))
+        self.assertEqual(26, len(resourceDeck.get(2)))
+        self.assertEqual(16, len(resourceDeck.get(3)))
+                     
+        self.assertEquals(4, len(actualDeck1))
+        self.assertEquals(4, len(actualDeck2))
+        self.assertEquals(4, len(actualDeck3))
+        
+        #if the deck has been randomized, we don't want to do the equality check
+        if not shuffled:
+            for idx, card in enumerate(actualDeck1):
+                self.assertResourceCardsEqual(expected1[idx], card)
+                
+            for idx, card in enumerate(actualDeck2):
+                self.assertResourceCardsEqual(expected2[idx], card)
+                
+            for idx, card in enumerate(actualDeck3):
+                self.assertResourceCardsEqual(expected3[idx], card)
     
     def testInitializeAvailableResourceCards(self):
         game: GameState = GameState()
@@ -227,28 +252,10 @@ class TestGameState(unittest.TestCase):
         
         game.initializeAvailableResourceCards()
         
-        #we want to test that the top 4 cards 
-        #have been moved to the availableResources deck
-        self.assertEqual(36, len(game.resourceDeck.get(1)))
-        self.assertEqual(26, len(game.resourceDeck.get(2)))
-        self.assertEqual(16, len(game.resourceDeck.get(3)))
-        
         actualDeck1:list = game.availableResources.get(1)
         actualDeck2:list = game.availableResources.get(2)
         actualDeck3:list = game.availableResources.get(3)
-        
-        self.assertEquals(4, len(actualDeck1))
-        self.assertEquals(4, len(actualDeck2))
-        self.assertEquals(4, len(actualDeck3))
-        
-        for idx, card in enumerate(actualDeck1):
-            self.assertResourceCardsEqual(expected1[idx], card)
-            
-        for idx, card in enumerate(actualDeck2):
-            self.assertResourceCardsEqual(expected2[idx], card)
-            
-        for idx, card in enumerate(actualDeck3):
-            self.assertResourceCardsEqual(expected3[idx], card)
+        self.assertAvailableResourcesDealt(game.resourceDeck, expected1, expected2, expected3, actualDeck1, actualDeck2, actualDeck3)
         
         pass
 
@@ -272,6 +279,36 @@ class TestGameState(unittest.TestCase):
         pass
     
     def testStartNewGame(self):
+        
+        names: list = ["playerA", "playerB", "playerC", "playerD"]
+        game: GameState = GameState()
+        game.setupGame(names)
+
+        deck1: list[ResourceCard] = game.resourceDeck.get(1)
+        deck2: list[ResourceCard] = game.resourceDeck.get(2)
+        deck3: list[ResourceCard] = game.resourceDeck.get(3)
+        expected1: list[ResourceCard] = [deck1[0], deck1[1], deck1[2], deck1[3]]
+        expected2: list[ResourceCard] = [deck2[0], deck2[1], deck2[2], deck2[3]]
+        expected3: list[ResourceCard] = [deck3[0], deck3[1], deck3[2], deck3[3]]
+        
+        game.startNewGame(1)
+        
+        #check randomize turn order
+        self.assertTrue(game.playersRandomized)
+        #check randomize resource deck
+        self.assertTrue(game.resourcesShuffled)
+        #check randomize noble deck
+        self.assertTrue(game.noblesShuffled)
+        
+        #check deal resource cards              
+        actualDeck1:list = game.availableResources.get(1)
+        actualDeck2:list = game.availableResources.get(2)
+        actualDeck3:list = game.availableResources.get(3)
+        self.assertAvailableResourcesDealt(game.resourceDeck, expected1, expected2, expected3, actualDeck1, actualDeck2, actualDeck3, 1)
+        
+        #check deal noble cards 
+        self.assertEqual(5, len(game.noblesDeck))
+        self.assertEqual(5,len(game.availableNobles))
         
         pass
 
