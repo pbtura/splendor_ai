@@ -40,10 +40,14 @@ class GameState(object):
     
     def setupGame(self, names:list[str]):
         #initialize players
+        self.addPlayers(names) 
         #initialize resource deck
+        self.initializeResourceDecks()
         #initialize noble deck
+        self.initializeNobleDeck()
         #initialize token bank
-        self.addPlayers(names)    
+        self.initializeAvailableGems()
+           
     
     def startNewGame(self):   
                 
@@ -98,20 +102,19 @@ class GameState(object):
         self.dealResourceCards(2, 4)
         self.dealResourceCards(3, 4)
         
-    
-    @staticmethod        
-    def initializeAvailableGems( numberOfPlayers: int)->TokenStore:
+          
+    def initializeAvailableGems(self):
+        numberOfPlayers: int = len(self.players)
         match numberOfPlayers:
             case 4:
-                 availableGems = TokenStore(7,7,7,7,7,5)
+                self.availableGems = TokenStore(7,7,7,7,7,5)
             case 3:
-                 availableGems = TokenStore(5,5,5,5,5,5)
+                self.availableGems = TokenStore(5,5,5,5,5,5)
             case 2:
-                 availableGems = TokenStore(4,4,4,4,4,5)
+                self.availableGems = TokenStore(4,4,4,4,4,5)
             case _:
-                availableGems = None
+                self.availableGems = None
        
-        return availableGems
     
     @staticmethod
     def parseResourceRow(rowData: Iterable)->ResourceCard:

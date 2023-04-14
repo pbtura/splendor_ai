@@ -55,6 +55,30 @@ class TestGameState(unittest.TestCase):
     def assertNobleDeckInitialized(self, deck: Iterable[NobleCard]):
         self.assertIsNotNone(deck)
         self.assertEqual(10, len(deck))
+        
+    def assertAvailableGemsInitialized(self, gems: TokenStore):
+        self.assertEqual(7, gems.tokens[Color.WHITE])
+        self.assertEqual(7, gems.tokens[Color.BLUE])
+        self.assertEqual(7, gems.tokens[Color.GREEN])
+        self.assertEqual(7, gems.tokens[Color.RED])
+        self.assertEqual(7, gems.tokens[Color.BLACK])
+        self.assertEqual(5, gems.tokens[Color.GOLD])
+        
+    def assertAvailableGemsInitializedForThreePlayers(self, gems: TokenStore):
+        self.assertEqual(5, gems.tokens[Color.WHITE])
+        self.assertEqual(5, gems.tokens[Color.BLUE])
+        self.assertEqual(5, gems.tokens[Color.GREEN])
+        self.assertEqual(5, gems.tokens[Color.RED])
+        self.assertEqual(5, gems.tokens[Color.BLACK])
+        self.assertEqual(5, gems.tokens[Color.GOLD])
+    
+    def assertAvailableGemsInitializedForTwoPlayers(self, gems: TokenStore):
+        self.assertEqual(4, gems.tokens[Color.WHITE])
+        self.assertEqual(4, gems.tokens[Color.BLUE])
+        self.assertEqual(4, gems.tokens[Color.GREEN])
+        self.assertEqual(4, gems.tokens[Color.RED])
+        self.assertEqual(4, gems.tokens[Color.BLACK])
+        self.assertEqual(5, gems.tokens[Color.GOLD])
     
     def testImportResourceDecks(self):
         decks: dict = None
@@ -86,38 +110,29 @@ class TestGameState(unittest.TestCase):
     
     def testInitializeAvailableGemsForTwoPlayers(self):
         
-        gems: TokenStore = GameState.initializeAvailableGems(2)
+        game: GameState = GameState()
+        game.addPlayers(["a", "b"])
+        game.initializeAvailableGems()
         
-        self.assertEqual(4, gems.tokens[Color.WHITE])
-        self.assertEqual(4, gems.tokens[Color.BLUE])
-        self.assertEqual(4, gems.tokens[Color.GREEN])
-        self.assertEqual(4, gems.tokens[Color.RED])
-        self.assertEqual(4, gems.tokens[Color.BLACK])
-        self.assertEqual(5, gems.tokens[Color.GOLD])
+        self.assertAvailableGemsInitializedForTwoPlayers(game.availableGems)
         pass
     
     def testInitializeAvailableGemsForThreePlayers(self):
         
-        gems: TokenStore = GameState.initializeAvailableGems(3)
+        game: GameState = GameState()
+        game.addPlayers(["a", "b", "c"])
+        game.initializeAvailableGems()
         
-        self.assertEqual(5, gems.tokens[Color.WHITE])
-        self.assertEqual(5, gems.tokens[Color.BLUE])
-        self.assertEqual(5, gems.tokens[Color.GREEN])
-        self.assertEqual(5, gems.tokens[Color.RED])
-        self.assertEqual(5, gems.tokens[Color.BLACK])
-        self.assertEqual(5, gems.tokens[Color.GOLD])
+        self.assertAvailableGemsInitializedForThreePlayers(game.availableGems)
         pass
     
     def testInitializeAvailableGemsForFourPlayers(self):
         
-        gems: TokenStore = GameState.initializeAvailableGems(4)
+        game: GameState = GameState()
+        game.addPlayers(["a", "b", "c", "d"])
+        game.initializeAvailableGems()
         
-        self.assertEqual(7, gems.tokens[Color.WHITE])
-        self.assertEqual(7, gems.tokens[Color.BLUE])
-        self.assertEqual(7, gems.tokens[Color.GREEN])
-        self.assertEqual(7, gems.tokens[Color.RED])
-        self.assertEqual(7, gems.tokens[Color.BLACK])
-        self.assertEqual(5, gems.tokens[Color.GOLD])
+        self.assertAvailableGemsInitialized(game.availableGems)
         pass
     
     def testParseNobleRow(self):
@@ -234,6 +249,29 @@ class TestGameState(unittest.TestCase):
             
         for idx, card in enumerate(actualDeck3):
             self.assertResourceCardsEqual(expected3[idx], card)
+        
+        pass
+
+    def testSetupGame(self):
+        names: list = ["playerA", "playerB", "playerC", "playerD"]
+        game: GameState = GameState()
+        game.setupGame(names)
+        
+        #check players were initialized
+        self.assertEqual(4, len(game.players))
+        
+        #check resource cards were initialized
+        self.assertResourceDeckInitialized(game.resourceDeck)
+        
+        #check the nobles deck was initialized
+        self.assertNobleDeckInitialized(game.noblesDeck)
+        
+        #check that the token bank was initialized
+        self.assertAvailableGemsInitialized(game.availableGems)
+        
+        pass
+    
+    def testStartNewGame(self):
         
         pass
 
