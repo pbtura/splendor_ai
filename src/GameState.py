@@ -166,7 +166,7 @@ class GameState(object):
     @staticmethod
     def parseNobleRow(rowData: Iterable)->NobleCard:
         row = dict(rowData)
-        cost: Cost = Cost(row['white'], row['blue'], row['green'], row['red'], row['black'])              
+        cost: Cost = Cost(int(row['white']), int(row['blue']), int(row['green']), int(row['red']), int(row['black']))              
         card = NobleCard( cost, row['PV'])
         
         return card;
@@ -239,7 +239,16 @@ class GameState(object):
         player.cards.append(card)
        
         
-    def claimNoble(self, player:Player, card: int):
-        print("claiming noble")
+    def claimNoble(self, player:Player, cardIdx: int):
+    
+        card:NobleCard = self.availableNobles[cardIdx]
+        totals:dict = player.getResourceTotals()
+        if(card.cost.white <= totals.get(Color.WHITE) and card.cost.blue <= totals.get(Color.BLUE) 
+           and card.cost.green <= totals.get(Color.GREEN) and card.cost.red <= totals.get(Color.RED) and card.cost.black <= totals.get(Color.BLACK)):
+            self.availableNobles.pop(cardIdx)
+            player.nobles.append(card)
+        else:
+            raise RuntimeError("Not enough resource cards to claim a noble.")
+
                     
         

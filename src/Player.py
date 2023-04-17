@@ -4,9 +4,10 @@ Created on Apr 11, 2023
 @author: bucpa
 '''
 from TokenStore import TokenStore
-from _collections_abc import Iterable
 from ResourceCard import ResourceCard
 from NobleCard import NobleCard
+from Color import Color
+from typing import Iterable
 
 class Player(object):
     '''
@@ -28,6 +29,15 @@ class Player(object):
         self.cards = []
         self.reservedCards = []
         self.nobles = []
+        
+    def getResourceTotals(self) -> dict[Color: int]:
+        card: ResourceCard
+        totals: dict[Color: int]={Color.WHITE: 0, Color.BLUE: 0, Color.GREEN: 0, Color.RED: 0, Color.BLACK: 0}
+        for card in self.cards:
+            t = totals.get(card.suit) + 1
+            totals[card.suit] = t
+            
+        return totals
         
     def __str__(self)->str:
         return f"turns taken:{self.turnsTaken}, gems:{self.gems}, resources:{self.cards}, reserved cards:{self.reservedCards}, nobles:{self.nobles}"

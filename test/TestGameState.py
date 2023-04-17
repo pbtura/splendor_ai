@@ -14,6 +14,7 @@ from NobleCard import NobleCard
 from Player import Player
 from TestGame import TestGame
 from TokenStore import TokenStore
+from test.test_json import test_pass3
 
 
 class TestGameState(TestGame):
@@ -492,8 +493,54 @@ class TestGameState(TestGame):
         self.assertResourceCardsEqual(expected, player.cards[0])
         pass
 
-    # def testClaimNoble(self):
-    #     self.fail("not implemented")
+    def testClaimNoble(self):
+        
+        game: GameState = self.createGame()
+        player: Player = game.players[0]
+        cardIdx: int = 0
+        
+        #PV    white    blue    green    red    black
+        # 3    0        0       4        4      0
+        expected:NobleCard = game.availableNobles[0]       
+        
+        idx: int = 21
+        while idx < 25 :           
+            card1: ResourceCard = game.resourceDeck.get(1)[idx]  
+            player.cards.append(card1)
+            idx += 1
+        
+        idx: int = 29
+        while idx < 33 :           
+            card2: ResourceCard = game.resourceDeck.get(1)[idx]  
+            player.cards.append(card2)
+            idx += 1    
+              
+        game.claimNoble(player, cardIdx)
+        
+        self.assertEqual(4, len(game.availableNobles))
+        self.assertEqual(1, len(player.nobles))
+        self.assertNobleCardsEqual(expected, player.nobles[0])
+        
+        pass
+        
+    def testClaimInvalidNoble(self):
+        
+        game: GameState = self.createGame()
+        player: Player = game.players[0]
+        cardIdx: int = 0
+        
+        card1: ResourceCard = game.resourceDeck.get(3)[9]  
+        
+        player.cards.append(card1)
+        
+        #PV    white    blue    green    red    black
+        # 3    0        0       4        4      0       
+        
+        with self.assertRaises(RuntimeError) as context:
+            game.claimNoble(player, cardIdx)
+        self.assertEqual("Not enough resource cards to claim a noble.", str(context.exception))
+        
+        pass
         
 
 if __name__ == "__main__":

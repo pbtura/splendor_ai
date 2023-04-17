@@ -23,4 +23,4 @@ class Cost(object):
         return self.white == other.white and self.blue == other.blue and self.green == other.green and self.red == other.red and self.black == other.black
         
     def __str__(self)->str:
-        return f"W:{self.white}, U:{self.blue}, , G:{self.green}, R:{self.red}, B:{self.black}"
+        return f"W:{self.white}, U:{self.blue}, G:{self.green}, R:{self.red}, B:{self.black}"
