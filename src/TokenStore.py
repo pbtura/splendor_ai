@@ -45,7 +45,7 @@ class TokenStore(object):
         if(new >= 2):
             self.validateWithdrawPair(color)
         if(old - new < 0):
-            raise RuntimeError("Cannot remove more gems than are in the store") 
+            raise RuntimeError("Cannot remove more gems than are in the store.") 
             return 0
         else:
             return 1

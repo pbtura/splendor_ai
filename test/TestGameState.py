@@ -315,7 +315,7 @@ class TestGameState(TestGame):
         
         with self.assertRaises(RuntimeError) as context:
             game.withdrawGems(player, expectedCost)
-        self.assertEqual("Cannot remove more gems than are in the store", str(context.exception))   
+        self.assertEqual("Cannot remove more gems than are in the store.", str(context.exception))   
         
     def testWithdrawInvalidGemPair(self):
         game: GameState = self.createGame()
@@ -401,9 +401,26 @@ class TestGameState(TestGame):
         
         pass
     
-    # def testPurchaseCardWithInsufficientGems(self):
-    #     self.fail("not implemented")
-    #
+    def testPurchaseCardWithInsufficientGems(self):
+        
+        game: GameState = self.createGame()
+        player: Player = game.players[0]
+        #setup the player such that they don't have the required (red) gems for the purchase
+        game.withdrawGems(player, {Color.WHITE: 1, Color.BLUE:1, Color.GREEN:1})        
+        
+        deckKey: int = 1
+        cardIdx: int = 0
+        
+        #Level    Gem color    PV    (w)hite    bl(u)e    (g)reen    (r)ed    blac(k)                                                                
+        #    1    BLACK        0     1          1         1          1        0                                                                
+        expected: ResourceCard = game.availableResources.get(deckKey)[cardIdx]
+        gems:dict = {Color.WHITE: expected.cost.white, Color.BLUE: expected.cost.blue, Color.GREEN: expected.cost.green, Color.RED: expected.cost.red, Color.BLACK: expected.cost.black, Color.GOLD: 0}
+        
+        with self.assertRaises(RuntimeError) as context:
+            game.purchaseCard(player, deckKey, cardIdx, gems)
+        self.assertEqual("Cannot remove more gems than are in the store.", str(context.exception))
+        pass
+    
     # def testReserveCard(self):
     #     self.fail("not implemented")
     #
