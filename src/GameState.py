@@ -226,8 +226,18 @@ class GameState(object):
          
         # print("reserving card")  
     
-    def claimReservedCard(self):
-        print ("claiming reserved card")
+    def claimReservedCard(self, player:Player, cardIdx, gems:TokenStore):
+        if( len(player.reservedCards) < cardIdx):
+            raise RuntimeError("The requested card index is out of bounds.")
+        
+        card:ResourceCard = player.reservedCards.pop(cardIdx)
+        #transfer the gems from the player to the bank
+        player.gems.withdrawTokens(gems)
+        self.availableGems.depositTokens(gems)
+        
+        #move the card from reserved to claimed
+        player.cards.append(card)
+       
         
     def claimNoble(self, player:Player, card: int):
         print("claiming noble")

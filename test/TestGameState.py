@@ -461,8 +461,37 @@ class TestGameState(TestGame):
             game.reserveCard(player, deckKey, cardIdx)
         self.assertEqual("A player cannot reserve more than three cards at once.", str(context.exception))
         
-    # def testClaimReservedCard(self):
-    #     self.fail("not implemented")
+    def testClaimReservedCard(self):
+        
+        game: GameState = self.createGame()
+        player: Player = game.players[0]
+        deckKey: int = 1
+        cardIdx: int = 0
+        
+        #Level    Gem color    PV    (w)hite    bl(u)e    (g)reen    (r)ed    blac(k)                                                                
+        #    1    BLACK        0     1          1         1          1        0                                                                
+        expected: ResourceCard = game.availableResources.get(deckKey)[cardIdx]
+        gems:dict = {Color.WHITE: expected.cost.white, Color.BLUE: expected.cost.blue, Color.GREEN: expected.cost.green, Color.RED: expected.cost.red, Color.BLACK: expected.cost.black, Color.GOLD: 0}
+
+        #setup the player with enough gems for the purchase
+        game.withdrawGems(player, {Color.WHITE: 1, Color.BLUE:1, Color.GREEN:1})
+        game.withdrawGems(player, {Color.WHITE: 1, Color.RED:1, Color.BLACK:1})
+        
+        #reserve the card
+        game.reserveCard(player, deckKey, cardIdx)
+        
+        #claim the reserved card
+        game.claimReservedCard(player, cardIdx, gems)
+        
+        #check that the correct amount of gems were transfered from the player to the bank
+        self.assertDictEqual({Color.WHITE: 1, Color.BLUE: 0, Color.GREEN: 0, Color.RED: 0, Color.BLACK: 1, Color.GOLD: 1}, player.gems.tokens)
+        self.assertDictEqual({Color.WHITE: 6, Color.BLUE: 7, Color.GREEN: 7, Color.RED: 7, Color.BLACK: 6, Color.GOLD: 4}, game.availableGems.tokens)
+        
+        #check that the card was moved from the reserved list to the players cards
+        self.assertEqual( 0, len(player.reservedCards))
+        self.assertResourceCardsEqual(expected, player.cards[0])
+        pass
+
     # def testClaimNoble(self):
     #     self.fail("not implemented")
         
