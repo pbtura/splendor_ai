@@ -18,17 +18,15 @@ class TokenStore(object):
         '''
         self.tokens = {Color.BLUE: blue, Color.BLACK: black, Color.WHITE: white, Color.RED: red, Color.GREEN: green, Color.GOLD: gold}
     
-    def updateTokens(self, tokens:Dict[str, int])-> bool:
+    def depositTokens(self, tokens:Dict[str, int])-> bool:
         for x,y in tokens.items():
             self.tokens[x] += y
     
         return 1   
     
     def withdrawTokens(self, tokens:Dict[str, int])-> bool:
-        for x,y in tokens.items():
-            if(y>=2):
-                self.validateWithdrawPair()
-            elif( self.validateWithdraw(self.tokens[x], y) ):
+        for x,y in tokens.items():              
+            if( self.validateWithdraw(self.tokens[x], y, x) ):
                 self.tokens[x] -= y
             else:
                 return 0
@@ -42,8 +40,10 @@ class TokenStore(object):
         else:
             return 1
         
-    def validateWithdraw(self, old, new)->bool:
+    def validateWithdraw(self, old, new, color: Color)->bool:
 
+        if(new >= 2):
+            self.validateWithdrawPair(color)
         if(old - new < 0):
             raise RuntimeError("Cannot remove more gems than are in the store") 
             return 0

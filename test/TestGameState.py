@@ -18,6 +18,7 @@ from TokenStore import TokenStore
 
 class TestGameState(TestGame):
 
+    INITIAL_GEMS: dict = {Color.WHITE:7, Color.BLUE: 7, Color.GREEN:7, Color.RED: 7, Color.BLACK: 7, Color.GOLD:5} 
 
     def setUp(self):
         pass
@@ -308,9 +309,9 @@ class TestGameState(TestGame):
         
         #withdraw gems until there are no white remaining
         i: int = 0
-        while i < 6:
+        while i < 7:
             game.withdrawGems(player, expectedCost)
-            i=+1
+            i+=1
         
         with self.assertRaises(RuntimeError) as context:
             game.withdrawGems(player, expectedCost)
@@ -319,40 +320,95 @@ class TestGameState(TestGame):
     def testWithdrawInvalidGemPair(self):
         game: GameState = self.createGame()
         player: Player = game.players[0]
-
-        #(white, blue, green, red, black)
-        expectedCost:dict = {Color.WHITE: 1}
         
         #withdraw gems until there are no white remaining
         i: int = 0
-        while i < 3:
-            game.withdrawGems(player, expectedCost)
-            i=+1
+        while i < 4:
+            game.withdrawGems(player, {Color.WHITE: 1})
+            i+=1
         
         with self.assertRaises(RuntimeError) as context:
-            game.withdrawGems(player, expectedCost)
+            game.withdrawGems(player, {Color.WHITE: 2})
         self.assertEqual("Cannot withdraw two matched gems when less than four remain.", str(context.exception))
     
     def testPurchaseCard(self):
         
-        # game: GameState = self.createGame()
-        # player: Player = game.players[0]
-        #
-        # deckKey: int = 1
-        # cardIdx: int = 0
-        # expected: ResourceCard = game.availableResources.get(deckKey)[cardIdx]
-        # expectedCost:Cost = expected.cost
+        game: GameState = self.createGame()
+        player: Player = game.players[0]
+        #setup the player with enough gems for the purchase
+        game.withdrawGems(player, {Color.WHITE: 1, Color.BLUE:1, Color.GREEN:1})
+        game.withdrawGems(player, {Color.WHITE: 1, Color.RED:1, Color.BLACK:1})
         
-        self.fail("not implemented")
+        
+        deckKey: int = 1
+        cardIdx: int = 0
+        
+        #Level    Gem color    PV    (w)hite    bl(u)e    (g)reen    (r)ed    blac(k)                                                                
+        #    1    BLACK        0     1          1         1          1        0                                                                
+        expected: ResourceCard = game.availableResources.get(deckKey)[cardIdx]
+        gems:dict = {Color.WHITE: expected.cost.white, Color.BLUE: expected.cost.blue, Color.GREEN: expected.cost.green, Color.RED: expected.cost.red, Color.BLACK: expected.cost.black, Color.GOLD: 0}
+        
+        game.purchaseCard(player, deckKey, cardIdx, gems)
+        actualPlayer:Player = game.players[0] 
+        
+        #check that the card was transferred to the player
+        self.assertEqual(1, len(actualPlayer.cards))
+        self.assertResourceCardsEqual(expected, actualPlayer.cards[0])
+        
+        #check that the correct amount of gems were transfered from
+        #the player to the bank
+        self.assertDictEqual({Color.WHITE: 1, Color.BLUE: 0, Color.GREEN: 0, Color.RED: 0, Color.BLACK: 1, Color.GOLD: 0}, player.gems.tokens)
+        self.assertDictEqual({Color.WHITE: 6, Color.BLUE: 7, Color.GREEN: 7, Color.RED: 7, Color.BLACK: 6, Color.GOLD: 5}, game.availableGems.tokens)       
+        
+        #make sure the purchased card was replaced
+        self.assertEqual(4, len(game.availableResources.get(deckKey)))
+        self.assertEqual(35, len(game.resourceDeck.get(deckKey)))
+        
+        pass
     
-    def testPurchaseCardWithInsufficientGems(self):
-        self.fail("not implemented")
+    def testPurchaseCardUsingGold(self):
+        
+        game: GameState = self.createGame()
+        player: Player = game.players[0]
+        #setup the player with enough gems for the purchase
+        game.withdrawGems(player, {Color.WHITE: 1, Color.BLUE:1, Color.GREEN:1})
+        game.withdrawGems(player, {Color.WHITE: 1, Color.RED:1, Color.GOLD:1})
+        
+        
+        deckKey: int = 1
+        cardIdx: int = 0
+        
+        #Level    Gem color    PV    (w)hite    bl(u)e    (g)reen    (r)ed    blac(k)                                                                
+        #    1    BLACK        0     1          1         1          1        0                                                                
+        expected: ResourceCard = game.availableResources.get(deckKey)[cardIdx]
+        gems:TokenStore = {Color.WHITE: 0, Color.BLUE: expected.cost.blue, Color.GREEN: expected.cost.green, Color.RED: expected.cost.red, Color.BLACK: expected.cost.black, Color.GOLD: 1}
+        
+        game.purchaseCard(player, deckKey, cardIdx, gems)
+        actualPlayer:Player = game.players[0] 
+        
+        #check that the card was transferred to the player
+        self.assertEqual(1, len(actualPlayer.cards))
+        self.assertResourceCardsEqual(expected, actualPlayer.cards[0])
+        
+        #check that the correct amount of gems were transfered from
+        #the player to the bank
+        self.assertDictEqual({Color.WHITE: 2, Color.BLUE: 0, Color.GREEN: 0, Color.RED: 0, Color.BLACK: 0, Color.GOLD: 0}, player.gems.tokens)
+        self.assertDictEqual({Color.WHITE: 5, Color.BLUE: 7, Color.GREEN: 7, Color.RED: 7, Color.BLACK: 7, Color.GOLD: 5}, game.availableGems.tokens)       
+        
+        #make sure the purchased card was replaced
+        self.assertEqual(4, len(game.availableResources.get(deckKey)))
+        self.assertEqual(35, len(game.resourceDeck.get(deckKey)))
+        
+        pass
     
-    def testReserveCard(self):
-        self.fail("not implemented")
-    
-    def testClaimNoble(self):
-        self.fail("not implemented")
+    # def testPurchaseCardWithInsufficientGems(self):
+    #     self.fail("not implemented")
+    #
+    # def testReserveCard(self):
+    #     self.fail("not implemented")
+    #
+    # def testClaimNoble(self):
+    #     self.fail("not implemented")
         
 
 if __name__ == "__main__":

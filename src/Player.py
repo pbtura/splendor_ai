@@ -14,7 +14,7 @@ class Player(object):
     '''
 
     gems: TokenStore
-    cards: Iterable[ResourceCard]
+    cards: list[ResourceCard]
     reservedCards: Iterable[ResourceCard]
     nobles: Iterable[NobleCard]
     

@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
     
     '''update the token store'''
-    result = store.updateTokens({Color.BLACK: 3, Color.RED: 1, Color.GREEN: 2})
+    result = store.depositTokens({Color.BLACK: 3, Color.RED: 1, Color.GREEN: 2})
     if(result):
         print("updated token store is", store)
     else:

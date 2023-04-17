@@ -15,6 +15,7 @@ from NobleCard import NobleCard
 from ResourceCard import ResourceCard
 from Color import Color
 from Player import Player
+from lib2to3.btm_utils import tokens
 
 class GameState(object):
     '''
@@ -142,8 +143,8 @@ class GameState(object):
         row = dict(rowData)
         colorName: str = row['Gem color']
         color: Color = Color[colorName] 
-        cost: Cost = Cost(row['white'], row['blue'], row['green'], row['red'], row['black'])              
-        card = ResourceCard(row['Level'], color, cost, row['PV'])
+        cost: Cost = Cost(int(row['white']), int(row['blue']), int(row['green']), int(row['red']), int(row['black']))              
+        card = ResourceCard(row['Level'], color, cost, int(row['PV']))
         
         return card;
 
@@ -184,10 +185,25 @@ class GameState(object):
             raise RuntimeError("No more than three gems may be withdrawn from the bank.")
 
         self.availableGems.withdrawTokens(gems);
-        player.gems.updateTokens(gems)       
+        player.gems.depositTokens(gems)       
     
-    def purchaseCard(self, player:Player, deck: int, card: int):     
-        print("purchasing card") 
+    def purchaseCard(self, player:Player, deck: int, cardIdx: int, gems: TokenStore):     
+        
+        card:ResourceCard = self.availableResources.get(deck).pop(cardIdx)
+        replacementCard:ResourceCard = self.resourceDeck.get(deck).pop()
+        
+        #verify the player has enough gems to complete the transaction
+        
+        #transfer the gems from the player to the bank
+        player.gems.withdrawTokens(gems)
+        self.availableGems.depositTokens(gems)
+        
+        #transfer the card to the player
+        player.cards.append(card)       
+        
+        #replace the card with the top card of the appropriate resources deck
+        self.availableResources.get(deck).append(replacementCard)
+        print(self.availableResources)
         
     def reserveCard(self, player:Player, deck: int, card: int):    
         print("reserving card")  
