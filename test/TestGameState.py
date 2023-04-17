@@ -421,9 +421,48 @@ class TestGameState(TestGame):
         self.assertEqual("Cannot remove more gems than are in the store.", str(context.exception))
         pass
     
-    # def testReserveCard(self):
+    def testReserveCard(self):
+        
+        game: GameState = self.createGame()
+        player: Player = game.players[0]
+        deckKey: int = 1
+        cardIdx: int = 0
+        
+        #Level    Gem color    PV    (w)hite    bl(u)e    (g)reen    (r)ed    blac(k)                                                                
+        #    1    BLACK        0     1          1         1          1        0                                                                
+        expected: ResourceCard = game.availableResources.get(deckKey)[cardIdx]
+        
+        game.reserveCard(player, deckKey, cardIdx)
+        
+        #check that a gold token was transferred from the bank to the player
+        self.assertDictEqual({Color.WHITE: 0, Color.BLUE: 0, Color.GREEN: 0, Color.RED: 0, Color.BLACK: 0, Color.GOLD: 1}, player.gems.tokens)
+        self.assertDictEqual({Color.WHITE: 7, Color.BLUE: 7, Color.GREEN: 7, Color.RED: 7, Color.BLACK: 7, Color.GOLD: 4}, game.availableGems.tokens) 
+        
+        #check that the card was transferred to the player
+        self.assertResourceCardsEqual(expected, player.reservedCards[0])
+        
+        #make sure the reserved card was replaced
+        self.assertEqual(4, len(game.availableResources.get(deckKey)))
+        self.assertEqual(35, len(game.resourceDeck.get(deckKey)))
+        pass
+    
+    def testReserveTooManyCards(self):
+        
+        game: GameState = self.createGame()
+        player: Player = game.players[0]
+        deckKey: int = 1
+        cardIdx: int = 0
+        
+        game.reserveCard(player, deckKey, cardIdx)
+        game.reserveCard(player, deckKey, cardIdx)
+        game.reserveCard(player, deckKey, cardIdx)
+        
+        with self.assertRaises(RuntimeError) as context:
+            game.reserveCard(player, deckKey, cardIdx)
+        self.assertEqual("A player cannot reserve more than three cards at once.", str(context.exception))
+        
+    # def testClaimReservedCard(self):
     #     self.fail("not implemented")
-    #
     # def testClaimNoble(self):
     #     self.fail("not implemented")
         

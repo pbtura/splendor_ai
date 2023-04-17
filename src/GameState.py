@@ -203,10 +203,31 @@ class GameState(object):
         
         #replace the card with the top card of the appropriate resources deck
         self.availableResources.get(deck).append(replacementCard)
-        print(self.availableResources)
+        # print(self.availableResources)
         
-    def reserveCard(self, player:Player, deck: int, card: int):    
-        print("reserving card")  
+    def reserveCard(self, player:Player, deck: int, cardIdx: int):   
+        
+        #check how many reserved cards the player currently has
+        if( len(player.reservedCards) >= 3):
+            raise RuntimeError("A player cannot reserve more than three cards at once.")
+        
+        card:ResourceCard = self.availableResources.get(deck).pop(cardIdx)
+        replacementCard:ResourceCard = self.resourceDeck.get(deck).pop()
+        
+        #transfer a gold token to the player
+        self.availableGems.withdrawTokens({Color.GOLD: 1})
+        player.gems.depositTokens({Color.GOLD: 1})
+        
+        #transfer the reserved card to the player
+        player.reservedCards.append(card)
+        
+        #replace the reserved card with the top card of the appropriate resources deck
+        self.availableResources.get(deck).append(replacementCard)
+         
+        # print("reserving card")  
+    
+    def claimReservedCard(self):
+        print ("claiming reserved card")
         
     def claimNoble(self, player:Player, card: int):
         print("claiming noble")
