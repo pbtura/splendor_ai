@@ -3,28 +3,33 @@ Created on Apr 11, 2023
 
 @author: bucpa
 '''
-from typing import Dict
+import numpy as np
+from collections import OrderedDict
 from Color import Color
-class TokenStore(object):
+from GemCollection import GemCollection
+class TokenStore(GemCollection):
     '''
     classdocs
     '''
 
-    tokens:Dict[str, int]
+    tokens:OrderedDict[str, int]
     
     def __init__(self, white: int, blue: int, green: int, red: int, black: int, gold: int):
         '''
         Constructor
         '''
-        self.tokens = {Color.BLUE: blue, Color.BLACK: black, Color.WHITE: white, Color.RED: red, Color.GREEN: green, Color.GOLD: gold}
+        self.tokens = {Color.WHITE: white, Color.BLUE: blue, Color.GREEN: green, Color.RED: red, Color.BLACK: black, Color.GOLD: gold}
     
-    def depositTokens(self, tokens:Dict[str, int])-> bool:
+    def getValues(self)->list:
+        return np.array(list(self.tokens.values()))
+    
+    def depositTokens(self, tokens:OrderedDict[str, int])-> bool:
         for x,y in tokens.items():
             self.tokens[x] += y
     
         return 1   
     
-    def withdrawTokens(self, tokens:Dict[str, int])-> bool:
+    def withdrawTokens(self, tokens:OrderedDict[str, int])-> bool:
         for x,y in tokens.items():              
             if( self.validateWithdraw(self.tokens[x], y, x) ):
                 self.tokens[x] -= y

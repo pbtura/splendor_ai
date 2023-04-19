@@ -7,6 +7,7 @@ import os
 import csv
 import random
 from collections import deque
+import numpy as np
 
 from Cost import Cost
 from _collections_abc import Iterable
@@ -15,7 +16,7 @@ from NobleCard import NobleCard
 from ResourceCard import ResourceCard
 from Color import Color
 from Player import Player
-from lib2to3.btm_utils import tokens
+from GemCollection import GemCollection
 
 class GameState(object):
     '''
@@ -190,10 +191,8 @@ class GameState(object):
     def purchaseCard(self, player:Player, deck: int, cardIdx: int, gems: TokenStore):     
         
         card:ResourceCard = self.availableResources.get(deck).pop(cardIdx)
-        replacementCard:ResourceCard = self.resourceDeck.get(deck).pop()
-        
-        #verify the player has enough gems to complete the transaction
-        
+        replacementCard:ResourceCard = self.resourceDeck.get(deck).popleft()
+              
         #transfer the gems from the player to the bank
         player.gems.withdrawTokens(gems)
         self.availableGems.depositTokens(gems)
@@ -212,7 +211,7 @@ class GameState(object):
             raise RuntimeError("A player cannot reserve more than three cards at once.")
         
         card:ResourceCard = self.availableResources.get(deck).pop(cardIdx)
-        replacementCard:ResourceCard = self.resourceDeck.get(deck).pop()
+        replacementCard:ResourceCard = self.resourceDeck.get(deck).popleft()
         
         #transfer a gold token to the player
         self.availableGems.withdrawTokens({Color.GOLD: 1})
@@ -249,6 +248,37 @@ class GameState(object):
             player.nobles.append(card)
         else:
             raise RuntimeError("Not enough resource cards to claim a noble.")
+        
+    @staticmethod
+    def canPurchase( cardCost:GemCollection, availableGems: TokenStore) -> bool:
+        arr:np.ndarray = availableGems.getValues()
+        # print(f"gems: {availableGems.getValues()}")
+        
+        delta: np.ndarray = cardCost.getValues() - availableGems.getValues()
+        filter = delta > 0
+        # print(f"delta: {delta}")
+        res = delta[filter]
+        # print(res)
+        deficit: int = np.sum(res)
+        if(deficit > 0):
+            deficit -= availableGems.tokens.get(Color.GOLD)
+            
+        # print(f"deficit: {deficit}")
+        # print("")
 
-                    
+        return deficit <= 0
+    
+    @staticmethod
+    def findAvailableResources(gems:TokenStore, resources: dict[int,list[ResourceCard]])->list:      
+        print("filtering")
+        results: list[ResourceCard] = []
+        cards:list[ResourceCard]
+        for x, cards in resources.items():
+            for card in cards:
+                cost: Cost = card.cost
+                if(GameState.canPurchase(cost, gems)):
+                    results.append(card)
+                # print(f"{x}, {cost}")
+        
+        return results;       
         

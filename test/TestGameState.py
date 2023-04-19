@@ -14,7 +14,6 @@ from NobleCard import NobleCard
 from Player import Player
 from TestGame import TestGame
 from TokenStore import TokenStore
-from test.test_json import test_pass3
 
 
 class TestGameState(TestGame):
@@ -347,6 +346,7 @@ class TestGameState(TestGame):
         #Level    Gem color    PV    (w)hite    bl(u)e    (g)reen    (r)ed    blac(k)                                                                
         #    1    BLACK        0     1          1         1          1        0                                                                
         expected: ResourceCard = game.availableResources.get(deckKey)[cardIdx]
+        expectedReplacement: ResourceCard = game.resourceDeck.get(deckKey)[0]
         gems:dict = {Color.WHITE: expected.cost.white, Color.BLUE: expected.cost.blue, Color.GREEN: expected.cost.green, Color.RED: expected.cost.red, Color.BLACK: expected.cost.black, Color.GOLD: 0}
         
         game.purchaseCard(player, deckKey, cardIdx, gems)
@@ -364,6 +364,7 @@ class TestGameState(TestGame):
         #make sure the purchased card was replaced
         self.assertEqual(4, len(game.availableResources.get(deckKey)))
         self.assertEqual(35, len(game.resourceDeck.get(deckKey)))
+        self.assertIn(expectedReplacement, game.availableResources.get(deckKey))
         
         pass
     
@@ -382,6 +383,7 @@ class TestGameState(TestGame):
         #Level    Gem color    PV    (w)hite    bl(u)e    (g)reen    (r)ed    blac(k)                                                                
         #    1    BLACK        0     1          1         1          1        0                                                                
         expected: ResourceCard = game.availableResources.get(deckKey)[cardIdx]
+        expectedReplacement: ResourceCard = game.resourceDeck.get(deckKey)[0]
         gems:TokenStore = {Color.WHITE: 0, Color.BLUE: expected.cost.blue, Color.GREEN: expected.cost.green, Color.RED: expected.cost.red, Color.BLACK: expected.cost.black, Color.GOLD: 1}
         
         game.purchaseCard(player, deckKey, cardIdx, gems)
@@ -399,6 +401,7 @@ class TestGameState(TestGame):
         #make sure the purchased card was replaced
         self.assertEqual(4, len(game.availableResources.get(deckKey)))
         self.assertEqual(35, len(game.resourceDeck.get(deckKey)))
+        self.assertIn(expectedReplacement, game.availableResources.get(deckKey))
         
         pass
     
@@ -433,6 +436,8 @@ class TestGameState(TestGame):
         #    1    BLACK        0     1          1         1          1        0                                                                
         expected: ResourceCard = game.availableResources.get(deckKey)[cardIdx]
         
+        expectedReplacement: ResourceCard = game.resourceDeck.get(deckKey)[0]
+        
         game.reserveCard(player, deckKey, cardIdx)
         
         #check that a gold token was transferred from the bank to the player
@@ -445,6 +450,8 @@ class TestGameState(TestGame):
         #make sure the reserved card was replaced
         self.assertEqual(4, len(game.availableResources.get(deckKey)))
         self.assertEqual(35, len(game.resourceDeck.get(deckKey)))
+        
+        self.assertIn(expectedReplacement, game.availableResources.get(deckKey))
         pass
     
     def testReserveTooManyCards(self):
@@ -541,7 +548,100 @@ class TestGameState(TestGame):
         self.assertEqual("Not enough resource cards to claim a noble.", str(context.exception))
         
         pass
+    
+    def testIsCardAffordable(self):
+        game: GameState = self.createGame()
+        player: Player = game.players[0]
         
+        deckKey: int = 1
+        cardIdx: int = 0
+        
+        #setup the player with enough gems for the purchase
+        game.withdrawGems(player, {Color.WHITE: 1, Color.BLUE:1, Color.GREEN:1})
+        game.withdrawGems(player, {Color.WHITE: 1, Color.RED:1, Color.GREEN:1})
+        
+        #reserve a card to add a gold gem
+        game.reserveCard(player, deckKey, cardIdx)
+        
+        #test a card affordable without gold
+        #Level    Gem color    PV    (w)hite    bl(u)e    (g)reen    (r)ed    blac(k)                                                                
+        #    1    BLACK        0     0          0         2          1        0    
+        card:ResourceCard = game.availableResources.get(1)[3]
+        # print(card)
+        
+        self.assertTrue(GameState.canPurchase(card.cost, player.gems) )               
+        
+        pass
+    
+    def testIsCardNotAffordable(self):
+        game: GameState = self.createGame()
+        player: Player = game.players[0]
+        
+        deckKey: int = 1
+        cardIdx: int = 0
+        
+        #setup the player with enough gems for the purchase
+        game.withdrawGems(player, {Color.WHITE: 1, Color.BLUE:1, Color.GREEN:1})
+        game.withdrawGems(player, {Color.WHITE: 1, Color.RED:1, Color.GREEN:1})
+        
+        #reserve a card to add a gold gem
+        game.reserveCard(player, deckKey, cardIdx)         
+        
+        #test a card that is not affordable
+        #Level    Gem color    PV    (w)hite    bl(u)e    (g)reen    (r)ed    blac(k)                                                                
+        #    1    BLACK        0     0          0         1          3        1    
+        card:ResourceCard = game.availableResources.get(1)[2]
+        # print(card)
+        
+        self.assertFalse(GameState.canPurchase(card.cost, player.gems) )
+        
+        pass
+    
+    def testIsCardAffordableWithGold(self):
+        game: GameState = self.createGame()
+        player: Player = game.players[0]
+        
+        deckKey: int = 1
+        cardIdx: int = 0
+        
+        #setup the player with enough gems for the purchase
+        game.withdrawGems(player, {Color.WHITE: 1, Color.BLUE:1, Color.GREEN:1})
+        game.withdrawGems(player, {Color.WHITE: 1, Color.RED:1, Color.GREEN:1})
+        
+        #reserve a card to add a gold gem
+        game.reserveCard(player, deckKey, cardIdx)       
+        
+        #test a card affordable if gold is used
+        #Level    Gem color    PV    (w)hite    bl(u)e    (g)reen    (r)ed    blac(k)                                                                
+        #    1    BLACK        0     2          2         0          1        0    
+        card:ResourceCard = game.availableResources.get(1)[1]
+        # print(card)
+        
+        self.assertTrue(GameState.canPurchase(card.cost, player.gems) )
+        
+        pass
+    
+    def testFilterAffordableCards(self):
+        
+        
+        game: GameState = self.createGame()
+        player: Player = game.players[0]
+        
+        deckKey: int = 1
+        cardIdx: int = 0
+        
+        #setup the player with enough gems for the purchase
+        game.withdrawGems(player, {Color.WHITE: 1, Color.BLUE:1, Color.GREEN:1})
+        game.withdrawGems(player, {Color.WHITE: 1, Color.RED:1, Color.GREEN:1})
+        
+        #reserve a card to add a gold gem
+        game.reserveCard(player, deckKey, cardIdx)         
+               
+        results: [ResourceCard] = GameState.findAvailableResources(player.gems, game.availableResources)
+        print(results)
+        self.assertEqual(3, len(results))
+        
+        pass
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testParseResourceRow']

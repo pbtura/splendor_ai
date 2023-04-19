@@ -3,14 +3,14 @@ Created on Apr 11, 2023
 
 @author: bucpa
 '''
-from CardCost import CardCost
+from Cost import Cost
 
 class NobleCard(object):
     '''
     classdocs
     '''
     
-    def __init__(self, cost: CardCost, points: int):
+    def __init__(self, cost: Cost, points: int):
         '''
         Constructor
         '''
