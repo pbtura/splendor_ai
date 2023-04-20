@@ -4,6 +4,8 @@ Created on Apr 14, 2023
 @author: bucpa
 '''
 import numpy as np
+from pynput.keyboard import Listener 
+
 from itertools import cycle
 from GameState import GameState
 from Player import Player
@@ -17,7 +19,9 @@ class GameActions(object):
     game:GameState
     players:cycle
     currentPlayer:Player
-
+    listener:Listener
+    listening: bool = 0
+   
     def __init__(self, names: Iterable[str], randomize: bool = 1):
         '''
         Constructor
@@ -27,18 +31,51 @@ class GameActions(object):
         self.game.startNewGame(randomize)
         self.players = cycle(self.game.players)
         
+        self.listener = Listener(
+            on_press = self.on_press
+        )
+        
     def promptUser(self):
-        action: str = input("Choose an action: 1)list available cards, 2)take gems, 3)buy card, 4)reserve card 0)cancel  ")
-        print(action)
+        print("Choose an action: 1)list available cards, 2)take gems, 3)buy card, 4)reserve card 5)list affordable cards q)end turn 0)cancel  ")
+        self.listener.start()
+        self.listener.join()
+        
+
+    def on_press(self,key):
+        print("Key pressed: {0}".format(key))
+        if hasattr(key, 'char'):  # Write the character pressed if available
+             
+            match key.char:
+                case '1':
+                    print(f"pressed {key.char}")
+                    self.listAvailableResources()
+                case '2':
+                    pass
+                case '3':
+                    pass
+                case '4':
+                    pass
+                case '5':
+                    cards = self.findAffordableCards()
+                    print(cards)
+                case 'q':
+                    self.takeTurn()
+                case _:
+                    pass
 
     def takeTurn(self):
+        if not(self.listening):
+            self.listening = 1
+            self.promptUser()
         self.currentPlayer = next(self.players)
-        self.promptUser()
-        # print(currentPlayer)
+        print(f"player {self.currentPlayer.name}, it is your turn")
     
     def findAffordableCards(self)->list:  
-        result = []
-        available = np.array( self.game.availableResources.get(1))
+        gems = self.currentPlayer.gems
+        resources = self.game.availableResources
+        discounts = list( self.currentPlayer.getResourceTotals().values() )
+        result = self.game.findAvailableResources(gems, resources, discounts)
+        
         return result  
     
     def listAvailableResources(self):
@@ -51,3 +88,4 @@ class GameActions(object):
             print(f"Noble {x}: {y}")
 
 
+    
