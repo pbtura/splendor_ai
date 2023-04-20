@@ -569,7 +569,7 @@ class TestGameState(TestGame):
         card:ResourceCard = game.availableResources.get(1)[3]
         # print(card)
         
-        self.assertTrue(GameState.canPurchase(card.cost, player.gems) )               
+        self.assertTrue(GameState.canPurchase(card.cost, player.gems, list(player.getResourceTotals().values())) )               
         
         pass
     
@@ -593,7 +593,7 @@ class TestGameState(TestGame):
         card:ResourceCard = game.availableResources.get(1)[2]
         # print(card)
         
-        self.assertFalse(GameState.canPurchase(card.cost, player.gems) )
+        self.assertFalse(GameState.canPurchase(card.cost, player.gems, list(player.getResourceTotals().values())) )
         
         pass
     
@@ -604,7 +604,7 @@ class TestGameState(TestGame):
         deckKey: int = 1
         cardIdx: int = 0
         
-        #setup the player with enough gems for the purchase
+        #setup the player enough gems for the purchase
         game.withdrawGems(player, {Color.WHITE: 1, Color.BLUE:1, Color.GREEN:1})
         game.withdrawGems(player, {Color.WHITE: 1, Color.RED:1, Color.GREEN:1})
         
@@ -617,7 +617,34 @@ class TestGameState(TestGame):
         card:ResourceCard = game.availableResources.get(1)[1]
         # print(card)
         
-        self.assertTrue(GameState.canPurchase(card.cost, player.gems) )
+        self.assertTrue(GameState.canPurchase(card.cost, player.gems, list(player.getResourceTotals().values())) )
+        
+        pass
+    
+    def testIsCardAffordableWithDiscounts(self):
+        game: GameState = self.createGame()
+        player: Player = game.players[0]
+        
+        #add enough cards to the player to reduce the cost of the card being
+        #purchased to an affordable state
+        crd1: ResourceCard = ResourceCard(1, Color.RED, Cost(3,0,0,0,0) ,0)
+        crd2: ResourceCard = ResourceCard(1, Color.BLACK, Cost(0,0,3,0,0) ,0)
+        player.cards.append(crd1)
+        player.cards.append(crd2)
+        
+        #setup the player with gems for the purchase
+        game.withdrawGems(player, {Color.WHITE: 1, Color.RED:1, Color.GREEN:1})
+        game.withdrawGems(player, {Color.WHITE: 1, Color.RED:1, Color.GREEN:1})     
+        
+        #test a card that is not affordable
+        #Level    Gem color    PV    (w)hite    bl(u)e    (g)reen    (r)ed    blac(k)                                                                
+        #    1    BLACK        0     0          0         1          3        1    
+        card:ResourceCard = game.availableResources.get(1)[3]
+        cardId: str = "1BLACK[00131]"
+        self.assertEqual(cardId, card.id)
+        # print(card)
+        discounts = player.getResourceTotals().values()
+        self.assertTrue(GameState.canPurchase(card.cost, player.gems, list(discounts)) )
         
         pass
     
@@ -637,8 +664,31 @@ class TestGameState(TestGame):
         #reserve a card to add a gold gem
         game.reserveCard(player, deckKey, cardIdx)         
                
-        results: [ResourceCard] = GameState.findAvailableResources(player.gems, game.availableResources)
+        results: [ResourceCard] = GameState.findAvailableResources(player.gems, game.availableResources, list(player.getResourceTotals().values()))
         print(results)
+        self.assertEqual(3, len(results))
+        
+        pass
+    
+    def testFilterAffordableCardsWithDiscounts(self):
+        
+        
+        game: GameState = self.createGame()
+        player: Player = game.players[0]
+        
+        #setup the player with enough gems for the purchase
+        player.gems = TokenStore(2, 1, 0, 1, 2, 1)
+        
+        #add enough cards to the player to reduce the cost of the card being
+        #purchased to an affordable state
+        crd1: ResourceCard = ResourceCard(1, Color.RED, Cost(3,0,0,0,0) ,0)
+        crd2: ResourceCard = ResourceCard(1, Color.BLUE, Cost(0,0,3,0,0) ,0)
+        player.cards.append(crd1)
+        player.cards.append(crd2)
+        
+               
+        results: [ResourceCard] = GameState.findAvailableResources(player.gems, game.availableResources, list(player.getResourceTotals().values()))
+        print(f"affordable {results}")
         self.assertEqual(3, len(results))
         
         pass

@@ -250,11 +250,10 @@ class GameState(object):
             raise RuntimeError("Not enough resource cards to claim a noble.")
         
     @staticmethod
-    def canPurchase( cardCost:GemCollection, availableGems: TokenStore) -> bool:
-        arr:np.ndarray = availableGems.getValues()
-        # print(f"gems: {availableGems.getValues()}")
+    def canPurchase( cardCost:GemCollection, availableGems: TokenStore, discounts:list[int]) -> bool:
         
-        delta: np.ndarray = cardCost.getValues() - availableGems.getValues()
+        available:np.ndarray = availableGems.getValues()[:-1]
+        delta: np.ndarray = (cardCost.getValues() - discounts ) - available 
         filter = delta > 0
         # print(f"delta: {delta}")
         res = delta[filter]
@@ -269,14 +268,14 @@ class GameState(object):
         return deficit <= 0
     
     @staticmethod
-    def findAvailableResources(gems:TokenStore, resources: dict[int,list[ResourceCard]])->list:      
+    def findAvailableResources(gems:TokenStore, resources: dict[int,list[ResourceCard]], discounts: list[int])->list:      
         print("filtering")
         results: list[ResourceCard] = []
         cards:list[ResourceCard]
-        for x, cards in resources.items():
+        for cards in resources.values():
             for card in cards:
                 cost: Cost = card.cost
-                if(GameState.canPurchase(cost, gems)):
+                if(GameState.canPurchase(cost, gems, discounts)):
                     results.append(card)
                 # print(f"{x}, {cost}")
         

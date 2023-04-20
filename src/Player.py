@@ -7,7 +7,7 @@ from TokenStore import TokenStore
 from ResourceCard import ResourceCard
 from NobleCard import NobleCard
 from Color import Color
-from typing import Iterable
+from typing import Iterable, OrderedDict
 
 class Player(object):
     '''
@@ -30,9 +30,9 @@ class Player(object):
         self.reservedCards = []
         self.nobles = []
         
-    def getResourceTotals(self) -> dict[Color: int]:
+    def getResourceTotals(self) -> OrderedDict[Color, int]:
         card: ResourceCard
-        totals: dict[Color: int]={Color.WHITE: 0, Color.BLUE: 0, Color.GREEN: 0, Color.RED: 0, Color.BLACK: 0}
+        totals: OrderedDict={Color.WHITE: 0, Color.BLUE: 0, Color.GREEN: 0, Color.RED: 0, Color.BLACK: 0}
         for card in self.cards:
             t = totals.get(card.suit) + 1
             totals[card.suit] = t
