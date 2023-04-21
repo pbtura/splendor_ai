@@ -1,2 +1,4 @@
 numpy
 pynput
+pyqt5-tools
+PyQt5
