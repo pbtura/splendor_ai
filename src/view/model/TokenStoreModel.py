@@ -13,13 +13,16 @@ class TokenStoreModel( QtCore.QAbstractTableModel):
     '''
 
 
-    def __init__(self, gems: TokenStore, headers):
+    def __init__(self, gems: TokenStore, headers, editable: bool):
         '''
         Constructor
         '''
         super(TokenStoreModel, self).__init__()
         self._data = gems.tokens
         self._headers = headers
+        self._flags = Qt.ItemIsSelectable | Qt.ItemIsEnabled
+        if(editable):
+            self._flags = Qt.ItemIsEditable | self._flags
     
     def data(self, index, role):
         if role == Qt.DisplayRole or role == Qt.EditRole:
@@ -54,5 +57,5 @@ class TokenStoreModel( QtCore.QAbstractTableModel):
             
             
     def flags(self, index):
-        return Qt.ItemIsEditable | Qt.ItemIsSelectable | Qt.ItemIsEnabled
+        return self._flags
         

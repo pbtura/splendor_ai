@@ -30,7 +30,7 @@ class GameActions(object):
         self.game.setupGame(names)
         self.game.startNewGame(randomize)
         self.players = cycle(self.game.players)
-        
+        self.currentPlayer = next(self.players)
         # self.listener = Listener(
         #     on_press = self.on_press
         # )

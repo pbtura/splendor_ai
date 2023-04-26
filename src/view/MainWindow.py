@@ -4,13 +4,14 @@ Created on Apr 21, 2023
 @author: bucpa
 '''
 import sys
+import traceback
 from view.mainform import Ui_Widget
 from view.gem_dialog import Ui_Dialog
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QDialog
 from GameActions import GameActions
 from view.model.PlayerList import PlayerList
-from view.GemTableView import GemTableView
+from view.widgets.GemTableView import GemTableView
 from TokenStore import TokenStore
 from view.model.TokenStoreModel import TokenStoreModel
 from Color import Color
@@ -65,7 +66,14 @@ class GemDialog(QDialog):
         self.ui.gemWithdrawTable.setModel(parent.tokenModel)
         # Run the .setupUi() method to show the GUI
         self.ui.setupUi(self)
-    
+ 
+
+if QtCore.QT_VERSION >= 0x50501:
+    def excepthook(type_, value, traceback_):
+        traceback.print_exception(type_, value, traceback_)
+        QtCore.qFatal('')
+sys.excepthook = excepthook
+   
 app = QtWidgets.QApplication(sys.argv)
 
 window = MainWindow()

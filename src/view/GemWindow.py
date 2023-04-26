@@ -33,8 +33,12 @@ class GemWindow(QtWidgets.QMainWindow, Ui_Dialog):
         self.gameActions = GameActions(["p1", "p2", "p3", "p4"])
         
         gems = self.gameActions.game.availableGems
-        tokenModel = TokenStoreModel(gems, [Color.WHITE, Color.BLUE, Color.GREEN, Color.RED, Color.BLACK])
-        self.gemWithdrawTable.setModel(tokenModel)
+        tokenModel = TokenStoreModel(gems, [Color.WHITE, Color.BLUE, Color.GREEN, Color.RED, Color.BLACK], 0)
+        self.gemsAvailableTable.setModel(tokenModel)
+        
+        currentPlayer = self.gameActions.currentPlayer
+        tokenDataModel = TokenStoreModel(currentPlayer.gems, [Color.WHITE, Color.BLUE, Color.GREEN, Color.RED, Color.BLACK], 1)
+        self.gemWithdrawTable.setModel(tokenDataModel)
         
     def accept(self):
         pass
