@@ -258,17 +258,18 @@ class TestGameState(TestGame):
         player: Player = game.players[0]
 
         #(white, blue, green, red, black)
-        expectedCost:dict = {Color.BLUE: 1, Color.RED: 1, Color.BLACK: 1}
+        expectedCost:dict = {Color.WHITE: 0, Color.BLUE: 1, Color.RED: 1, Color.BLACK: 1}
         
         game.withdrawGems(player, expectedCost)
         actualPlayer = game.players[0]
         
         for x in expectedCost.keys():
+            print(x)
             #check that the gems were withdrawn from the game store
-            self.assertEquals( 6, game.availableGems.tokens.get(x))
+            self.assertEquals( 7-expectedCost.get(x), game.availableGems.tokens.get(x))
             
             #check that the gems were added to the player store
-            self.assertEqual(1, actualPlayer.gems.tokens.get(x))
+            self.assertEqual(expectedCost.get(x), actualPlayer.gems.tokens.get(x))
         
               
         pass
@@ -298,11 +299,11 @@ class TestGameState(TestGame):
         player: Player = game.players[0]
 
         #(white, blue, green, red, black)
-        expectedCost:dict = {Color.WHITE: 1, Color.BLUE: 1, Color.RED: 1, Color.BLACK: 1}              
+        expectedCost:dict = {Color.WHITE: 1, Color.BLUE: 2}              
         
         with self.assertRaises(RuntimeError) as context:
             game.withdrawGems(player, expectedCost)
-        self.assertEqual("No more than three gems may be withdrawn from the bank.", str(context.exception))             
+        self.assertEqual("Invalid withdraw. Valid combinations are 2 of a single color or one each of 3 different colors.", str(context.exception))             
     
     def testWithdrawMoreGemsThanAvailable(self):
         game: GameState = self.createGame()

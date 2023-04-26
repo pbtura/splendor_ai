@@ -14,6 +14,7 @@ from view.model.PlayerList import PlayerList
 from TokenStore import TokenStore
 from view.model.TokenStoreModel import TokenStoreModel
 from Color import Color
+from typing import OrderedDict
 
 class GemWindow(QtWidgets.QMainWindow, Ui_Dialog):
     '''
@@ -32,14 +33,20 @@ class GemWindow(QtWidgets.QMainWindow, Ui_Dialog):
         self.players = []
         self.gameActions = GameActions(["p1", "p2", "p3", "p4"])
         
-        gems = self.gameActions.game.availableGems
-        tokenModel = TokenStoreModel(gems, [Color.WHITE, Color.BLUE, Color.GREEN, Color.RED, Color.BLACK], 0)
-        self.gemsAvailableTable.setModel(tokenModel)
+        
+        bank = self.gameActions.game.availableGems
+        # tokenModel = TokenStoreModel(gems, [Color.WHITE, Color.BLUE, Color.GREEN, Color.RED, Color.BLACK], [1, 0, 0])
+        # self.gemsAvailableTable.setModel(tokenModel)
         
         currentPlayer = self.gameActions.currentPlayer
-        tokenDataModel = TokenStoreModel(currentPlayer.gems, [Color.WHITE, Color.BLUE, Color.GREEN, Color.RED, Color.BLACK], 1)
-        self.gemWithdrawTable.setModel(tokenDataModel)
+        # tokenDataModel = TokenStoreModel(currentPlayer.gems, [Color.WHITE, Color.BLUE, Color.GREEN, Color.RED, Color.BLACK], 1)
+        # self.gemWithdrawTable.setModel(tokenDataModel)
         
+        headers = [Color.WHITE, Color.BLUE, Color.GREEN, Color.RED, Color.BLACK]
+        data:list = [["to withdraw:", TokenStore(0,0,0,0,0,0)], ["gems available", bank], ["Currently held", currentPlayer.gems]]
+        
+        tokenModel = TokenStoreModel(data, headers, [1, 0, 0])
+        self.gemsAvailableTable.setModel(tokenModel)
     def accept(self):
         pass
     

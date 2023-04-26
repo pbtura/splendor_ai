@@ -14,25 +14,15 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
-        Dialog.resize(603, 500)
+        Dialog.resize(1268, 547)
         self.layoutWidget = QtWidgets.QWidget(Dialog)
-        self.layoutWidget.setGeometry(QtCore.QRect(20, 20, 561, 355))
+        self.layoutWidget.setGeometry(QtCore.QRect(20, 20, 1171, 355))
         self.layoutWidget.setObjectName("layoutWidget")
         self.verticalLayout_7 = QtWidgets.QVBoxLayout(self.layoutWidget)
         self.verticalLayout_7.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_7.setObjectName("verticalLayout_7")
         self.verticalLayout_6 = QtWidgets.QVBoxLayout()
         self.verticalLayout_6.setObjectName("verticalLayout_6")
-        self.label = QtWidgets.QLabel(self.layoutWidget)
-        self.label.setObjectName("label")
-        self.verticalLayout_6.addWidget(self.label)
-        self.gemWithdrawTable = GemTableView(self.layoutWidget)
-        self.gemWithdrawTable.setMidLineWidth(1)
-        self.gemWithdrawTable.setAutoScrollMargin(19)
-        self.gemWithdrawTable.setEditTriggers(QtWidgets.QAbstractItemView.AnyKeyPressed|QtWidgets.QAbstractItemView.DoubleClicked|QtWidgets.QAbstractItemView.EditKeyPressed|QtWidgets.QAbstractItemView.SelectedClicked)
-        self.gemWithdrawTable.setObjectName("gemWithdrawTable")
-        self.gemWithdrawTable.horizontalHeader().setMinimumSectionSize(52)
-        self.verticalLayout_6.addWidget(self.gemWithdrawTable)
         self.verticalLayout_12 = QtWidgets.QVBoxLayout()
         self.verticalLayout_12.setObjectName("verticalLayout_12")
         self.label_6 = QtWidgets.QLabel(self.layoutWidget)
@@ -57,8 +47,7 @@ class Ui_Dialog(object):
     def retranslateUi(self, Dialog):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
-        self.label.setText(_translate("Dialog", "Gems to withdraw:"))
-        self.label_6.setText(_translate("Dialog", "Gems available:"))
+        self.label_6.setText(_translate("Dialog", "Gems:"))
 from view.widgets.GemTableView import GemTableView
 
 

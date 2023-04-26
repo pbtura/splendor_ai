@@ -89,6 +89,8 @@ class GameActions(object):
     def listAvailableNobles(self):
         for x, y in enumerate(self.game.availableNobles):
             print(f"Noble {x}: {y}")
-
+            
+    def withdrawGems(self, gems):
+        self.game.withdrawGems(self.currentPlayer, gems)
 
     

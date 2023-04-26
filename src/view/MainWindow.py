@@ -8,6 +8,7 @@ import traceback
 from view.mainform import Ui_Widget
 from view.gem_dialog import Ui_Dialog
 from PyQt5 import QtWidgets, QtCore
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog
 from GameActions import GameActions
 from view.model.PlayerList import PlayerList
@@ -15,13 +16,15 @@ from view.widgets.GemTableView import GemTableView
 from TokenStore import TokenStore
 from view.model.TokenStoreModel import TokenStoreModel
 from Color import Color
+from PyQt5.Qt import QModelIndex
 
 class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
     '''
     classdocs
     '''
     gameActions: GameActions
-
+    _headers = [Color.WHITE, Color.BLUE, Color.GREEN, Color.RED, Color.BLACK]
+    
     def __init__(self, *args, obj=None, **kwargs):
         '''
         Constructor
@@ -51,10 +54,32 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
        
         
     def openGemDialog(self):
-        gems = self.gameActions.game.availableGems
-        self.tokenModel = TokenStoreModel(gems, [Color.WHITE, Color.BLUE, Color.GREEN, Color.RED, Color.BLACK])
+        
+        bank = self.gameActions.game.availableGems
+        
+        currentPlayer = self.gameActions.currentPlayer
+        
+        
+        data:list = [["to withdraw:", TokenStore(0,0,0,0,0,0)], ["gems available", bank], ["Currently held", currentPlayer.gems]]
+        
+        self.tokenModel = TokenStoreModel(data, self._headers, [1, 0, 0])
+        
         dlg = GemDialog(self)
+        dlg.ui.gemDialogButtons.accepted.connect(self.handleGemsUpdated)
         dlg.exec()
+ 
+    def handleGemsUpdated(self):
+        print("dialog closed and saved")
+        
+        gems = {}
+        for x, y in enumerate(self._headers):          
+            index: QModelIndex = self.tokenModel.index(0, x)
+            model = index.data(Qt.EditRole)
+            print(f"{y}:{model}")
+            gems[y] = model
+        
+        print(gems)
+        self.gameActions.withdrawGems(gems)
  
 class GemDialog(QDialog):   
         
@@ -62,11 +87,13 @@ class GemDialog(QDialog):
         super().__init__(parent)
         # Create an instance of the GUI
         self.ui = Ui_Dialog()
-        self.ui.gemWithdrawTable = GemTableView(self)
-        self.ui.gemWithdrawTable.setModel(parent.tokenModel)
+
         # Run the .setupUi() method to show the GUI
         self.ui.setupUi(self)
+        self.ui.gemsAvailableTable.setModel(parent.tokenModel)
  
+    def save(self):
+        print("saving")
 
 if QtCore.QT_VERSION >= 0x50501:
     def excepthook(type_, value, traceback_):

@@ -184,8 +184,13 @@ class GameState(object):
     
     def withdrawGems(self, player:Player, gems: dict):
         
-        if(len(gems) > 3):
-            raise RuntimeError("No more than three gems may be withdrawn from the bank.")
+        total:int = 0
+        for x in gems.values():
+            if(total >=1 and x > 1):
+                raise RuntimeError("Invalid withdraw. Valid combinations are 2 of a single color or one each of 3 different colors.")
+            total += x
+            if(x > 3):
+                raise RuntimeError("No more than three gems may be withdrawn from the bank.")
 
         self.availableGems.withdrawTokens(gems);
         player.gems.depositTokens(gems)       
