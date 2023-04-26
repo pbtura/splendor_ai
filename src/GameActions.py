@@ -31,10 +31,13 @@ class GameActions(object):
         self.game.startNewGame(randomize)
         self.players = cycle(self.game.players)
         
-        self.listener = Listener(
-            on_press = self.on_press
-        )
+        # self.listener = Listener(
+        #     on_press = self.on_press
+        # )
         
+    def getPlayersList(self)->list:
+        return self.game.players
+    
     def promptUser(self):
         print("Choose an action: 1)list available cards, 2)take gems, 3)buy card, 4)reserve card 5)list affordable cards q)end turn 0)cancel  ")
         self.listener.start()

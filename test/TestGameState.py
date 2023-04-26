@@ -20,11 +20,15 @@ class TestGameState(TestGame):
 
     INITIAL_GEMS: dict = {Color.WHITE:7, Color.BLUE: 7, Color.GREEN:7, Color.RED: 7, Color.BLACK: 7, Color.GOLD:5} 
 
+    game: GameState
+    
     def setUp(self):
+        self.game: GameState = GameState( os.path.join('..','resources','cards_list.csv'), os.path.join('..','resources','nobles_list.csv'))
         pass
 
 
     def tearDown(self):
+        self.game = None
         pass
 
     def assertResourceCardsEqual(self,expected:ResourceCard, actual:ResourceCard):
@@ -59,7 +63,7 @@ class TestGameState(TestGame):
         pass
     
     def testInitializeResourceDeck(self):
-        game: GameState = GameState()
+        game: GameState = self.game
         game.initializeResourceDecks()
         
         self.assertResourceDeckInitialized(game.resourceDeck)
@@ -67,7 +71,7 @@ class TestGameState(TestGame):
     
     def testInitializeAvailableGemsForTwoPlayers(self):
         
-        game: GameState = GameState()
+        game: GameState = self.game
         game.addPlayers(["a", "b"])
         game.initializeAvailableGems()
         
@@ -76,7 +80,7 @@ class TestGameState(TestGame):
     
     def testInitializeAvailableGemsForThreePlayers(self):
         
-        game: GameState = GameState()
+        game: GameState = self.game
         game.addPlayers(["a", "b", "c"])
         game.initializeAvailableGems()
         
@@ -85,7 +89,7 @@ class TestGameState(TestGame):
     
     def testInitializeAvailableGemsForFourPlayers(self):
         
-        game: GameState = GameState()
+        game: GameState = self.game
         game.addPlayers(["a", "b", "c", "d"])
         game.initializeAvailableGems()
         
@@ -111,14 +115,14 @@ class TestGameState(TestGame):
         pass
     
     def testInitializeNobleDeck(self):
-        game: GameState = GameState()
+        game: GameState = self.game
         game.initializeNobleDeck()
         
         self.assertNobleDeckInitialized(game.noblesDeck)
         pass
     
     def testAddPlayers(self):
-        game: GameState = GameState()
+        game: GameState = self.game
         playerNames = ["playerA", "playerB"]
         game.addPlayers(playerNames)
         self.assertIsNotNone(game.players)
@@ -131,7 +135,7 @@ class TestGameState(TestGame):
     
     def testDealResourceCards(self):
         
-        game: GameState = GameState()
+        game: GameState = self.game
         game.initializeResourceDecks()
         deck1: list[ResourceCard] = game.resourceDeck.get(1)
         expected1: list[ResourceCard] = [deck1[0], deck1[1], deck1[2], deck1[3]]
@@ -148,7 +152,7 @@ class TestGameState(TestGame):
         pass
     
     def testDealNobleCards(self):
-        game: GameState = GameState()
+        game: GameState = self.game
         game.initializeNobleDeck()
         game.dealNobleCards(4);
         
@@ -157,7 +161,7 @@ class TestGameState(TestGame):
         pass
     
     def testDealNobleCardsForThreePlayers(self):
-        game: GameState = GameState()
+        game: GameState = self.game
         game.initializeNobleDeck()
         game.dealNobleCards(3);
         
@@ -166,7 +170,7 @@ class TestGameState(TestGame):
         pass
     
     def testDealNobleCardsForTwoPlayers(self):
-        game: GameState = GameState()
+        game: GameState = self.game
         game.initializeNobleDeck()
         game.dealNobleCards(2);
         
@@ -175,7 +179,7 @@ class TestGameState(TestGame):
         pass
        
     def testInitializeAvailableResourceCards(self):
-        game: GameState = GameState()
+        game: GameState = self.game
         game.initializeResourceDecks()
         deck1: list[ResourceCard] = game.resourceDeck.get(1)
         deck2: list[ResourceCard] = game.resourceDeck.get(2)
@@ -196,7 +200,7 @@ class TestGameState(TestGame):
 
     def testSetupGame(self):
         names: list = ["playerA", "playerB", "playerC", "playerD"]
-        game: GameState = GameState()
+        game: GameState = self.game
         game.setupGame(names)
         
         #check players were initialized
@@ -216,7 +220,7 @@ class TestGameState(TestGame):
     def testStartNewGame(self):
         
         names: list = ["playerA", "playerB", "playerC", "playerD"]
-        game: GameState = GameState()
+        game: GameState = self.game
         game.setupGame(names)
         
         game.startNewGame(1)
@@ -242,7 +246,7 @@ class TestGameState(TestGame):
     
     def createGame(self) -> GameState:
         names: list = ["playerA", "playerB", "playerC", "playerD"]
-        game: GameState = GameState()
+        game: GameState = GameState( os.path.join('..','resources','cards_list.csv'), os.path.join('..','resources','nobles_list.csv'))
         game.setupGame(names)
         game.startNewGame(0)
         
@@ -678,7 +682,7 @@ class TestGameState(TestGame):
         
         #setup the player with enough gems for the purchase
         player.gems = TokenStore(2, 1, 0, 1, 2, 1)
-        
+
         #add enough cards to the player to reduce the cost of the card being
         #purchased to an affordable state
         crd1: ResourceCard = ResourceCard(1, Color.RED, Cost(3,0,0,0,0) ,0)

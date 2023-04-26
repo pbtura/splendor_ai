@@ -36,12 +36,14 @@ class GameState(object):
     resourcesShuffled:bool = 0
     noblesShuffled:bool = 0
     
-    def __init__(self):
+    def __init__(self, cardsPath: str = os.path.join('..','..','resources','cards_list.csv'), noblesPath: str = os.path.join('..','..','resources','nobles_list.csv')):
         '''
         Constructor
         '''
         self.availableResources = {1: [], 2: [], 3: []}
         self.noblesDeck = deque()
+        self.cardsPath = cardsPath
+        self.noblesPath = noblesPath
     
     def setupGame(self, names:list[str]):
         #initialize players
@@ -91,13 +93,13 @@ class GameState(object):
     def initializeResourceDecks(self):  
         
         self.resourceDeck = {}
-        with open(os.path.join('..','resources','cards_list.csv'), newline='') as f:
+        with open(self.cardsPath, newline='') as f:
             reader = csv.DictReader(f)
             self.resourceDeck = GameState.importResourceDecks(reader)
     
     def initializeNobleDeck(self):
         self.noblesDeck = []
-        with open(os.path.join('..','resources','nobles_list.csv'), newline='') as f:
+        with open(self.noblesPath, newline='') as f:
             reader = csv.DictReader(f)
             self.noblesDeck = GameState.importNobleDeck(reader)
     
