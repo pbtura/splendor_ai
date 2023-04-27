@@ -16,7 +16,7 @@ from view.widgets.GemTableView import GemTableView
 from TokenStore import TokenStore
 from view.model.TokenStoreModel import TokenStoreModel
 from Color import Color
-from PyQt5.Qt import QModelIndex
+from PyQt5.Qt import QModelIndex, pyqtSignal, QObject, QAbstractItemView
 
 class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
     '''
@@ -49,6 +49,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
                 pass
             case 1:
                 self.openGemDialog()
+            case 2:
+                pass
             case _:
                 pass
        
@@ -65,11 +67,10 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
         self.tokenModel = TokenStoreModel(data, self._headers, [1, 0, 0])
         
         dlg = GemDialog(self)
-        dlg.ui.gemDialogButtons.accepted.connect(self.handleGemsUpdated)
+        dlg.save.connect(self.handleGemsUpdated)
         dlg.exec()
  
-    def handleGemsUpdated(self):
-        print("dialog closed and saved")
+    def handleGemsUpdated(self, parent):
         
         gems = {}
         for x, y in enumerate(self._headers):          
@@ -78,13 +79,22 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
             print(f"{y}:{model}")
             gems[y] = model
         
-        print(gems)
-        self.gameActions.withdrawGems(gems)
- 
-class GemDialog(QDialog):   
+        try:          
+            # print(gems)
+            self.gameActions.withdrawGems(gems)
+            parent.close()
+        except RuntimeError as e:
+            print(e)
+            errorDialog = QtWidgets.QErrorMessage(parent)
+            errorDialog.showMessage( str(e))
+
+class GemDialog(QDialog, QObject):   
         
+    save = pyqtSignal(QAbstractItemView)
+    
     def __init__(self, parent=None):
         super().__init__(parent)
+        
         # Create an instance of the GUI
         self.ui = Ui_Dialog()
 
@@ -92,8 +102,9 @@ class GemDialog(QDialog):
         self.ui.setupUi(self)
         self.ui.gemsAvailableTable.setModel(parent.tokenModel)
  
-    def save(self):
-        print("saving")
+    def accept(self):
+        print("do nothing")
+        self.save.emit(self)
 
 if QtCore.QT_VERSION >= 0x50501:
     def excepthook(type_, value, traceback_):
