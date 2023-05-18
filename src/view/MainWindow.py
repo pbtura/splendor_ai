@@ -17,6 +17,7 @@ from TokenStore import TokenStore
 from view.model.TokenStoreModel import TokenStoreModel
 from Color import Color
 from Player import Player
+from view.model.ResourceCardModel import ResourceCardModel
 from PyQt5.Qt import QModelIndex, pyqtSignal, QObject, QAbstractItemView
 
 class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
@@ -50,11 +51,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
         headersList.append(Color.GOLD)    
         self._playerGemModel = TokenStoreModel(data, headersList, [0])
         self.playerGemsTable.setModel(self._playerGemModel)
+        
+        
         self.updatePlayerData(self.gameActions.currentPlayer)
         
     def updatePlayerData(self, player:Player):
         self.playerName.setText(player.name)
-        self.currentPointsLabel.setText( str(player.getTotalPoints()))
+        self.currentPointsLabel.setText( str(player.getTotalPoints()))      
+        self._playerCardsModel = ResourceCardModel(player.cards)
+        self.purchasedCardsList.setModel(self._playerCardsModel)
         
     def refreshPlayerGems(self):
         data:list = [ ["Currently held", self.gameActions.currentPlayer.gems]]
