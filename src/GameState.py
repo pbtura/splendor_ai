@@ -36,7 +36,7 @@ class GameState(object):
     resourcesShuffled:bool = 0
     noblesShuffled:bool = 0
     
-    def __init__(self, cardsPath: str = os.path.join('..','..','resources','cards_list.csv'), noblesPath: str = os.path.join('..','..','resources','nobles_list.csv')):
+    def __init__(self, cardsPath: str, noblesPath: str):
         '''
         Constructor
         '''

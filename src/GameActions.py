@@ -4,6 +4,7 @@ Created on Apr 14, 2023
 @author: bucpa
 '''
 import numpy as np
+import os
 from pynput.keyboard import Listener 
 
 from itertools import cycle
@@ -22,11 +23,11 @@ class GameActions(object):
     listener:Listener
     listening: bool = 0
    
-    def __init__(self, names: Iterable[str], randomize: bool = 1):
+    def __init__(self, names: Iterable[str], randomize: bool = 1, cardsPath: str = os.path.join('..','..','resources','cards_list.csv'), noblesPath: str = os.path.join('..','..','resources','nobles_list.csv')):
         '''
         Constructor
         '''
-        self.game = GameState()
+        self.game = GameState(cardsPath, noblesPath)
         self.game.setupGame(names)
         self.game.startNewGame(randomize)
         self.players = cycle(self.game.players)

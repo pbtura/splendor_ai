@@ -40,7 +40,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
         self.playersModel = PlayerList(players=self.players)
         self.playersListView.setModel(self.playersModel)
        
-        self.gameActionsDropdown.currentIndexChanged.connect(self.onActionSelected)
+        self.gameActionsDropdown.activated.connect(self.onActionSelected)
         self.onActionSelected(self.gameActionsDropdown.currentIndex())
         
         #populate the player gems table
@@ -54,7 +54,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
         
     def updatePlayerData(self, player:Player):
         self.playerName.setText(player.name)
-        # self.currentPointsLabel.setText(player.)
+        self.currentPointsLabel.setText( str(player.getTotalPoints()))
         
     def refreshPlayerGems(self):
         data:list = [ ["Currently held", self.gameActions.currentPlayer.gems]]

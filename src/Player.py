@@ -38,6 +38,15 @@ class Player(object):
             totals[card.suit] = t
             
         return totals
+    
+    def getTotalPoints(self):
+        
+        total: int = 0
+        for card in self.cards:
+            total += card.points
+        
+        return total
+        
         
     def __str__(self)->str:
         return f"name:{self.name}, turns taken:{self.turnsTaken}, gems:{self.gems}, resources:{self.cards}, reserved cards:{self.reservedCards}, nobles:{self.nobles}"

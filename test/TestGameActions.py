@@ -4,6 +4,7 @@ Created on Apr 14, 2023
 @author: bucpa
 '''
 import unittest
+import os
 from TestGame import TestGame
 from GameActions import GameActions
 from GameState import GameState
@@ -21,7 +22,7 @@ class TestActions(TestGame):
 
 
     def testInitialize(self):
-        actions:GameActions = GameActions(["playerA", "playerB", "playerC", "playerD"], 1)
+        actions:GameActions = GameActions(["playerA", "playerB", "playerC", "playerD"], 1, os.path.join('..','resources','cards_list.csv'), os.path.join('..','resources','nobles_list.csv'))
         game:GameState = actions.game
        
         #check players were initialized
