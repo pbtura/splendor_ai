@@ -34,9 +34,9 @@ class ResourceCardModel( QtCore.QAbstractTableModel):
                 case 0:
                     return str(item.level)
                 case 1:
-                    return str(item.suit)
+                    return str(item.suit.name)
                 case 2:
-                    str(item.points)
+                    return str(item.points)
                 case 3:
                     return str(item.cost)
                 case _:
@@ -50,6 +50,17 @@ class ResourceCardModel( QtCore.QAbstractTableModel):
     def columnCount(self, index):
         # The length of our headers.
         return len(self._headers)
+    
+    def headerData(self, section, orientation, role):
+        # section is the index of the column/row.
+        if role == Qt.DisplayRole:
+            if orientation == Qt.Horizontal:
+                return str(self._headers[section])
+
+            if orientation == Qt.Vertical:
+                return ""
+
+
             
             
     # def flags(self, index:QModelIndex):

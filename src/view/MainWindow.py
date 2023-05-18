@@ -55,6 +55,15 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
         
         self.updatePlayerData(self.gameActions.currentPlayer)
         
+        cards = self.gameActions.game.availableResources
+        lvOneModel = ResourceCardModel( cards.get(1))
+        lvTwoModel = ResourceCardModel( cards.get(2))
+        lvThreeModel = ResourceCardModel( cards.get(3))
+        
+        self.lvOneCardsTable.setModel(lvOneModel)
+        self.lvTwoCardsTable.setModel(lvTwoModel)
+        self.lvThreeCardsTable.setModel(lvThreeModel)
+        
     def updatePlayerData(self, player:Player):
         self.playerName.setText(player.name)
         self.currentPointsLabel.setText( str(player.getTotalPoints()))      
