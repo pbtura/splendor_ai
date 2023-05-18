@@ -5,6 +5,7 @@ Created on Apr 25, 2023
 '''
 from PyQt5 import QtCore
 import PyQt5.Qt as qt
+from PyQt5.QtCore import Qt
 from PyQt5.Qt import QAbstractTableModel
 
 class GemTableView(qt.QTableView):
@@ -23,10 +24,16 @@ class GemTableView(qt.QTableView):
         
     def setModel(self, model: QAbstractTableModel):
         super().setModel(model)
-        i: int = 0
-        while i < model.columnCount(0):
-            self.openPersistentEditor(model.index(0, i))
-            i+=1
+        
+        r: int = 0
+        while r < model.rowCount(0):              
+            i: int = 0
+            while i < model.columnCount(r):
+                flags = model.flags(model.index(r, i))    
+                if(flags & Qt.ItemIsEditable):
+                    self.openPersistentEditor(model.index(r, i))
+                i+=1
+            r += 1
             
 # class ComboDelegate(qt.QItemDelegate):
 #     """

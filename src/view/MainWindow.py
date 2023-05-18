@@ -16,6 +16,7 @@ from view.widgets.GemTableView import GemTableView
 from TokenStore import TokenStore
 from view.model.TokenStoreModel import TokenStoreModel
 from Color import Color
+from Player import Player
 from PyQt5.Qt import QModelIndex, pyqtSignal, QObject, QAbstractItemView
 
 class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
@@ -41,6 +42,23 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
        
         self.gameActionsDropdown.currentIndexChanged.connect(self.onActionSelected)
         self.onActionSelected(self.gameActionsDropdown.currentIndex())
+        
+        #populate the player gems table
+        data:list = [ ["", self.gameActions.currentPlayer.gems]]  
+        
+        headersList = self._headers 
+        headersList.append(Color.GOLD)    
+        self._playerGemModel = TokenStoreModel(data, headersList, [0])
+        self.playerGemsTable.setModel(self._playerGemModel)
+        self.updatePlayerData(self.gameActions.currentPlayer)
+        
+    def updatePlayerData(self, player:Player):
+        self.playerName.setText(player.name)
+        # self.currentPointsLabel.setText(player.)
+        
+    def refreshPlayerGems(self):
+        data:list = [ ["Currently held", self.gameActions.currentPlayer.gems]]
+        self._playerGemModel.refreshData( data)
     
     def onActionSelected(self, index):
         print(f"dd changed to {index}")
@@ -83,6 +101,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
             # print(gems)
             self.gameActions.withdrawGems(gems)
             parent.close()
+            self.refreshPlayerGems()
         except RuntimeError as e:
             print(e)
             errorDialog = QtWidgets.QErrorMessage(parent)

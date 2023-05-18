@@ -40,6 +40,12 @@ class TokenStoreModel( QtCore.QAbstractTableModel):
             self._data[index.row()][1].tokens[column_key] = value
             return True
     
+    def refreshData(self, gems):
+        self._data = gems
+        topLeft = self.index(0,0)
+        bottomRight = self.createIndex(len(gems)-1, len(self._headers)-1)
+        self.dataChanged.emit(topLeft, bottomRight)
+    
     def rowCount(self, index):
         # The length of the outer list.
         return len(self._data)
