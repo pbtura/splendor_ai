@@ -3,11 +3,9 @@ Created on Apr 25, 2023
 
 @author: bucpa
 '''
-from TokenStore import TokenStore
+
 from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
-from typing import OrderedDict
-from PyQt5.Qt import QModelIndex
 from ResourceCard import ResourceCard
 
 class ResourceCardModel( QtCore.QAbstractTableModel):
@@ -24,11 +22,11 @@ class ResourceCardModel( QtCore.QAbstractTableModel):
         self._data = cards
     
     def data(self, index, role):
-        if role == Qt.DisplayRole or role == Qt.EditRole:
-            # Look up the key by header index.
-            column = index.column()
-            row = index.row()
-            item:ResourceCard = self._data[row]
+        column = index.column()
+        row = index.row()
+        item:ResourceCard = self._data[row]
+        
+        if role == Qt.DisplayRole or role == Qt.EditRole:            
             
             match column: 
                 case 0:
@@ -42,6 +40,15 @@ class ResourceCardModel( QtCore.QAbstractTableModel):
                 case _:
                     return ""
 
+    def getRow(self, index, role):
+        row = index.row()
+        item:ResourceCard = self._data[row]
+        
+        if role == Qt.DisplayRole or role == Qt.EditRole:                       
+            return [str(item.level), str(item.suit.name), str(item.points), str(item.cost)]
+                
+        elif role == Qt.UserRole:
+            return item
     
     def rowCount(self, index):
         # The length of the outer list.

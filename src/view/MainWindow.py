@@ -55,14 +55,28 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
         
         self.updatePlayerData(self.gameActions.currentPlayer)
         
-        cards = self.gameActions.game.availableResources
-        lvOneModel = ResourceCardModel( cards.get(1))
-        lvTwoModel = ResourceCardModel( cards.get(2))
-        lvThreeModel = ResourceCardModel( cards.get(3))
+        self.cards = self.gameActions.game.availableResources
+        self.lvOneModel = ResourceCardModel( self.cards.get(1))
+        self.lvTwoModel = ResourceCardModel( self.cards.get(2))
+        self.lvThreeModel = ResourceCardModel( self.cards.get(3))
         
-        self.lvOneCardsTable.setModel(lvOneModel)
-        self.lvTwoCardsTable.setModel(lvTwoModel)
-        self.lvThreeCardsTable.setModel(lvThreeModel)
+        self.lvOneCardsTable.setModel(self.lvOneModel)
+        self.lvTwoCardsTable.setModel(self.lvTwoModel)
+        self.lvThreeCardsTable.setModel(self.lvThreeModel)
+        
+        self.lvOneCardsTable.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
+        self.lvTwoCardsTable.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
+        self.lvThreeCardsTable.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
+        
+        self.lvOneCardsTable.doubleClicked.connect(lambda index, model=self.lvOneModel: self.availableCardDoubleClicked(index, model))
+        self.lvTwoCardsTable.doubleClicked.connect(lambda index, model=self.lvTwoModel: self.availableCardDoubleClicked(index, model))
+        self.lvThreeCardsTable.doubleClicked.connect(lambda index, model=self.lvThreeModel: self.availableCardDoubleClicked(index, model))
+    
+    def availableCardDoubleClicked(self, item:QModelIndex, model:ResourceCardModel):
+        msgDialog = QtWidgets.QMessageBox(self)
+        itemData = model.getRow(item, Qt.UserRole)
+        msgDialog.setText(str(itemData))
+        msgDialog.show()
         
     def updatePlayerData(self, player:Player):
         self.playerName.setText(player.name)
