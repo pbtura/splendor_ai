@@ -3,7 +3,6 @@ Created on Apr 11, 2023
 
 @author: bucpa
 '''
-import os
 import csv
 import random
 from collections import deque
@@ -17,6 +16,7 @@ from ResourceCard import ResourceCard
 from Color import Color
 from Player import Player
 from GemCollection import GemCollection
+from numpy import ndarray
 
 class GameState(object):
     '''
@@ -29,7 +29,7 @@ class GameState(object):
     availableNobles:Iterable[NobleCard]
     noblesDeck:deque[NobleCard]
     
-    availableResources:dict[int,list[ResourceCard]]
+    availableResources:dict[int,ndarray[ResourceCard]]
     resourceDeck:dict[int, deque[ResourceCard]]
     
     playersRandomized:bool = 0

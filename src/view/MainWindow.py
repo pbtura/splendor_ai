@@ -17,6 +17,7 @@ from TokenStore import TokenStore
 from view.model.TokenStoreModel import TokenStoreModel
 from Color import Color
 from Player import Player
+from ResourceCard import ResourceCard
 from view.model.ResourceCardModel import ResourceCardModel
 from PyQt5.Qt import QModelIndex, pyqtSignal, QObject, QAbstractItemView
 
@@ -56,6 +57,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
         self.updatePlayerData(self.gameActions.currentPlayer)
         
         self.cards = self.gameActions.game.availableResources
+        self.purchaseCardButton.setEnabled(0)
+        self.reserveCardButton.setEnabled(0)
+        
         self.lvOneModel = ResourceCardModel( self.cards.get(1))
         self.lvTwoModel = ResourceCardModel( self.cards.get(2))
         self.lvThreeModel = ResourceCardModel( self.cards.get(3))
@@ -68,15 +72,40 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
         self.lvTwoCardsTable.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
         self.lvThreeCardsTable.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
         
-        self.lvOneCardsTable.doubleClicked.connect(lambda index, model=self.lvOneModel: self.availableCardDoubleClicked(index, model))
-        self.lvTwoCardsTable.doubleClicked.connect(lambda index, model=self.lvTwoModel: self.availableCardDoubleClicked(index, model))
-        self.lvThreeCardsTable.doubleClicked.connect(lambda index, model=self.lvThreeModel: self.availableCardDoubleClicked(index, model))
+        self.lvOneCardsTable.clicked.connect(lambda index, model=self.lvOneModel: self.resourceCardSelected(index, model))
+        self.lvTwoCardsTable.clicked.connect(lambda index, model=self.lvTwoModel: self.resourceCardSelected(index, model))
+        self.lvThreeCardsTable.clicked.connect(lambda index, model=self.lvThreeModel: self.resourceCardSelected(index, model))
+        
+        #setup the purchase and reserve buttons
+        # self.purchaseCardButton.click.connect()
     
-    def availableCardDoubleClicked(self, item:QModelIndex, model:ResourceCardModel):
-        msgDialog = QtWidgets.QMessageBox(self)
-        itemData = model.getRow(item, Qt.UserRole)
-        msgDialog.setText(str(itemData))
-        msgDialog.show()
+    @property
+    def selectedCard(self)-> ResourceCard:
+        return self._selectedCard
+    
+    @selectedCard.setter
+    def selectedCard(self, card:ResourceCard):
+        self._selectedCard = card
+        #enable/disable the purchase and reserve buttons here
+        if card is None:
+            self.purchaseCardButton.setEnabled(0)
+            self.reserveCardButton.setEnabled(0)
+        else:
+            self.purchaseCardButton.setEnabled(1)
+            self.reserveCardButton.setEnabled(1)
+        
+    def resourceCardSelected(self, item:QModelIndex, model:ResourceCardModel):
+        modifiers = QtWidgets.QApplication.keyboardModifiers()
+        if modifiers == QtCore.Qt.ControlModifier:
+            self.selectedCard = None
+        else:
+            self.selectedCard = model.getRow(item, Qt.UserRole)
+            # msgDialog = QtWidgets.QMessageBox(self)
+            # msgDialog.setText(str(self.selectedCard))
+            # msgDialog.show()
+    
+    def purchaseButtonClicked(self):
+        pass
         
     def updatePlayerData(self, player:Player):
         self.playerName.setText(player.name)

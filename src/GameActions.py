@@ -93,5 +93,8 @@ class GameActions(object):
             
     def withdrawGems(self, gems):
         self.game.withdrawGems(self.currentPlayer, gems)
+        
+    def purchaseCard(self):
+        pass
 
     
