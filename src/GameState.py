@@ -126,8 +126,7 @@ class GameState(object):
         self.dealResourceCards(1, 4)
         self.dealResourceCards(2, 4)
         self.dealResourceCards(3, 4)
-        
-          
+
     def initializeAvailableGems(self):
         numberOfPlayers: int = len(self.players)
         match numberOfPlayers:
@@ -139,8 +138,7 @@ class GameState(object):
                 self.availableGems = TokenStore(4,4,4,4,4,5)
             case _:
                 self.availableGems = None
-       
-    
+
     @staticmethod
     def parseResourceRow(rowData: Iterable)->ResourceCard:
         row = dict(rowData)
@@ -154,7 +152,6 @@ class GameState(object):
     @staticmethod
     def importResourceDecks(reader) -> dict:       
         decks: dict = {1: deque(), 2: deque(), 3: deque()}
-
 
         for row in reader:
             #print(row)               
@@ -184,7 +181,7 @@ class GameState(object):
     
     def withdrawGems(self, player:Player, gems: dict):
         
-        total:int = 0
+        total: int = 0
         for x in gems.values():
             if(total >=1 and x > 1):
                 raise RuntimeError("Invalid withdraw. Valid combinations are 2 of a single color or one each of 3 different colors.")
@@ -195,10 +192,10 @@ class GameState(object):
         self.availableGems.withdrawTokens(gems);
         player.gems.depositTokens(gems)       
     
-    def purchaseCard(self, player:Player, deck: int, cardIdx: int, gems: TokenStore):     
+    def purchaseCard(self, player: Player, deck: int, cardIdx: int, gems: TokenStore):
         
-        card:ResourceCard = self.availableResources.get(deck).pop(cardIdx)
-        replacementCard:ResourceCard = self.resourceDeck.get(deck).popleft()
+        card: ResourceCard = self.availableResources.get(deck).pop(cardIdx)
+        replacementCard: ResourceCard = self.resourceDeck.get(deck).popleft()
               
         #transfer the gems from the player to the bank
         player.gems.withdrawTokens(gems)

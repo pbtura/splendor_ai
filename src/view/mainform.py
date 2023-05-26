@@ -92,7 +92,7 @@ class Ui_Widget(object):
         self.label_2.setFont(font)
         self.label_2.setObjectName("label_2")
         self.horizontalLayout_4.addWidget(self.label_2)
-        self.purchaseCardButton = QtWidgets.QPushButton(self.layoutWidget)
+        self.purchaseCardButton:QtWidgets.QPushButton = QtWidgets.QPushButton(self.layoutWidget)
         self.purchaseCardButton.setObjectName("purchaseCardButton")
         self.horizontalLayout_4.addWidget(self.purchaseCardButton)
         self.reserveCardButton = QtWidgets.QPushButton(self.layoutWidget)
