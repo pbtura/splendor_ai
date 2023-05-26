@@ -6,16 +6,16 @@ Created on Apr 25, 2023
 from TokenStore import TokenStore
 from PyQt5 import QtCore
 from PyQt5.QtCore import Qt
-from typing import OrderedDict
+from typing import OrderedDict, Any
 from PyQt5.Qt import QModelIndex
 
-class TokenStoreModel( QtCore.QAbstractTableModel):
+
+class TokenStoreModel(QtCore.QAbstractTableModel):
     '''
     classdocs
     '''
 
-
-    def __init__(self, gems: list[ str, TokenStore], headers, editable: list):
+    def __init__(self, gems: list[str, TokenStore], headers, editable: list):
         '''
         Constructor
         '''
@@ -24,13 +24,13 @@ class TokenStoreModel( QtCore.QAbstractTableModel):
         self._headers = headers
         self._flags = editable
     
-    def data(self, index, role):
+    def data(self, index: QModelIndex, role: int = ...) -> Any:
         if role == Qt.DisplayRole or role == Qt.EditRole:
             # Look up the key by header index.
             column = index.column()
             column_key = self._headers[column]
             row = index.row()
-            store = self._data[row][1]
+            store: TokenStore = self._data[row][1]
             return int(store.tokens[column_key])
     
     def setData(self, index, value, role):

@@ -48,6 +48,8 @@ class Ui_Dialog(object):
         _translate = QtCore.QCoreApplication.translate
         Dialog.setWindowTitle(_translate("Dialog", "Dialog"))
         self.label_6.setText(_translate("Dialog", "Gems:"))
+
+
 from view.widgets.GemTableView import GemTableView
 
 

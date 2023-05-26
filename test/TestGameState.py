@@ -26,7 +26,6 @@ class TestGameState(TestGame):
         self.game: GameState = GameState( os.path.join('..','resources','cards_list.csv'), os.path.join('..','resources','nobles_list.csv'))
         pass
 
-
     def tearDown(self):
         self.game = None
         pass

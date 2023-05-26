@@ -16,18 +16,17 @@ from typing import OrderedDict
 class Test(unittest.TestCase):
 
     def setUp(self):
-        self.actions = GameActions(["playerA", "playerB"], 1, os.path.join('..','resources','cards_list.csv'), os.path.join('..','resources','nobles_list.csv'))
+        self.actions = GameActions(["playerA", "playerB"], True, os.path.join('..','resources','cards_list.csv'), os.path.join('..','resources','nobles_list.csv'))
         pass
-
 
     def tearDown(self):
         self.actions = None
         pass
     
     def testGetResourceTotals(self):
-        player:Player = self.actions.currentPlayer
+        player: Player = self.actions.currentPlayer
         
-        expectedTotals: OrderedDict={Color.WHITE: 0, Color.BLUE: 0, Color.GREEN: 0, Color.RED: 2, Color.BLACK: 1} 
+        expectedTotals: OrderedDict = {Color.WHITE: 0, Color.BLUE: 0, Color.GREEN: 0, Color.RED: 2, Color.BLACK: 1}
 
         #add resource cards
         crd1: ResourceCard = ResourceCard(1, Color.RED, Cost(3,0,0,0,0) ,0)
@@ -40,7 +39,6 @@ class Test(unittest.TestCase):
         actualTotals: OrderedDict = player.getResourceTotals()
         for key, value in actualTotals.items():
             self.assertEqual(expectedTotals.get(key), value)
-
 
     def testGetPoints(self):
 

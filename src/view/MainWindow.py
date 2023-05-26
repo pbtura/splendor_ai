@@ -5,12 +5,12 @@ Created on Apr 21, 2023
 '''
 import sys
 import traceback
-from view.mainform import Ui_Widget
-from view.gem_dialog import Ui_Dialog
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QDialog
+
 from GameActions import GameActions
+from view.gem_dialog import Ui_Dialog
 from view.model.PlayerList import PlayerList
 from view.widgets.GemTableView import GemTableView
 from TokenStore import TokenStore
@@ -21,12 +21,18 @@ from ResourceCard import ResourceCard
 from view.model.ResourceCardModel import ResourceCardModel
 from PyQt5.Qt import QModelIndex, pyqtSignal, QObject, QAbstractItemView
 
+from view.mainform import Ui_Widget
+
+
 class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
     '''
     classdocs
     '''
     gameActions: GameActions
     _headers = [Color.WHITE, Color.BLUE, Color.GREEN, Color.RED, Color.BLACK]
+    _playerCardsModel: ResourceCardModel
+    _selectedCard: ResourceCard
+    tokenModel: TokenStoreModel
     
     def __init__(self, *args, obj=None, **kwargs):
         '''
@@ -46,14 +52,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
         self.onActionSelected(self.gameActionsDropdown.currentIndex())
         
         #populate the player gems table
-        data:list = [ ["", self.gameActions.currentPlayer.gems]]  
+        data: list = [["", self.gameActions.currentPlayer.gems]]
         
         headersList = self._headers 
         headersList.append(Color.GOLD)    
         self._playerGemModel = TokenStoreModel(data, headersList, [0])
         self.playerGemsTable.setModel(self._playerGemModel)
-        
-        
+
         self.updatePlayerData(self.gameActions.currentPlayer)
         
         self.cards = self.gameActions.game.availableResources
@@ -80,11 +85,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
         # self.purchaseCardButton.click.connect()
     
     @property
-    def selectedCard(self)-> ResourceCard:
+    def selectedCard(self) -> ResourceCard:
         return self._selectedCard
     
     @selectedCard.setter
-    def selectedCard(self, card:ResourceCard):
+    def selectedCard(self, card: ResourceCard):
         self._selectedCard = card
         #enable/disable the purchase and reserve buttons here
         if card is None:
@@ -94,7 +99,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
             self.purchaseCardButton.setEnabled(1)
             self.reserveCardButton.setEnabled(1)
         
-    def resourceCardSelected(self, item:QModelIndex, model:ResourceCardModel):
+    def resourceCardSelected(self, item: QModelIndex, model: ResourceCardModel):
         modifiers = QtWidgets.QApplication.keyboardModifiers()
         if modifiers == QtCore.Qt.ControlModifier:
             self.selectedCard = None
@@ -135,9 +140,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
         bank = self.gameActions.game.availableGems
         
         currentPlayer = self.gameActions.currentPlayer
-        
-        
-        data:list = [["to withdraw:", TokenStore(0,0,0,0,0,0)], ["gems available", bank], ["Currently held", currentPlayer.gems]]
+
+        data: list = [["to withdraw:", TokenStore(0,0,0,0,0,0)], ["gems available", bank], ["Currently held", currentPlayer.gems]]
         
         self.tokenModel = TokenStoreModel(data, self._headers, [1, 0, 0])
         
@@ -164,6 +168,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
             errorDialog = QtWidgets.QErrorMessage(parent)
             errorDialog.showMessage( str(e))
 
+
 class GemDialog(QDialog, QObject):   
         
     save = pyqtSignal(QAbstractItemView)
@@ -181,6 +186,7 @@ class GemDialog(QDialog, QObject):
     def accept(self):
         print("do nothing")
         self.save.emit(self)
+
 
 if QtCore.QT_VERSION >= 0x50501:
     def excepthook(type_, value, traceback_):

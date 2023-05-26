@@ -14,12 +14,11 @@ from NobleCard import NobleCard
 from Player import Player
 from typing import Iterable
 
-class TestGame(unittest.TestCase):
 
+class TestGame(unittest.TestCase):
 
     def setUp(self):
         pass
-
 
     def tearDown(self):
         pass
@@ -75,9 +74,9 @@ class TestGame(unittest.TestCase):
         self.assertEqual(26, len(resourceDeck.get(2)))
         self.assertEqual(16, len(resourceDeck.get(3)))
                      
-        self.assertEquals(4, len(actualDeck1))
-        self.assertEquals(4, len(actualDeck2))
-        self.assertEquals(4, len(actualDeck3))
+        self.assertEqual(4, len(actualDeck1))
+        self.assertEqual(4, len(actualDeck2))
+        self.assertEqual(4, len(actualDeck3))
         
         #if the deck has been randomized, we don't want to do the equality check
         if not shuffled:
