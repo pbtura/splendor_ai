@@ -60,8 +60,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
         self._playerGemModel = TokenStoreModel(data, headersList, [0])
         self.playerGemsTable.setModel(self._playerGemModel)
 
-        self.updatePlayerData(self.gameActions.currentPlayer)
-
         self.cards = self.gameActions.game.availableResources
         self.purchaseCardButton.setEnabled(0)
         self.reserveCardButton.setEnabled(0)
@@ -87,6 +85,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
 
         # setup the purchase and reserve buttons
         self.purchaseCardButton.clicked.connect(self.purchaseButtonClicked)
+
+        self.updatePlayerData()
 
     @property
     def selectedCard(self) -> ResourceCard:
@@ -116,11 +116,13 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
     def purchaseButtonClicked(self):
         self.openPurchaseCardDialog(self.selectedCard)
 
-    def updatePlayerData(self, player: Player):
+    def updatePlayerData(self):
+        player = self.gameActions.currentPlayer
         self.playerName.setText(player.name)
         self.currentPointsLabel.setText(str(player.getTotalPoints()))
         self._playerCardsModel = ResourceCardModel(player.cards)
-        self.purchasedCardsList.setModel(self._playerCardsModel)
+        self.purchasedCardsTable.setModel(self._playerCardsModel)
+        self.refreshPlayerGems()
 
     def refreshPlayerGems(self):
         data: list = [["Currently held", self.gameActions.currentPlayer.gems]]
@@ -166,7 +168,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
             # print(gems)
             self.gameActions.withdrawGems(gems)
             parent.close()
-            self.refreshPlayerGems()
+            self.updatePlayerData()
         except RuntimeError as e:
             print(e)
             errorDialog = QtWidgets.QErrorMessage(parent)
@@ -198,7 +200,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
         try:
             self.gameActions.purchaseCard(self.selectedCard.level, self.selectedCard, gems)
             parent.close()
-            self.refreshPlayerGems()
+            self.updatePlayerData()
         except RuntimeError as e:
             print(e)
             errorDialog = QtWidgets.QErrorMessage(parent)
