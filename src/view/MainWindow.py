@@ -49,14 +49,19 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
         self.playersModel = PlayerList(players=self.players)
         self.playersListView.setModel(self.playersModel)
 
-        self.gameActionsDropdown.activated.connect(self.onActionSelected)
-        self.onActionSelected(self.gameActionsDropdown.currentIndex())
+        headersList = self._headers
+        headersList.append(Color.GOLD)
+        #initialize the gems bank
+        bank = self.gameActions.game.availableGems
+        data: list = [["gems available", bank]]
+
+        tokenModel = TokenStoreModel(data, headersList, [0])
+        self.bankGemsTable.setModel(tokenModel)
+
+        self.withdrawGemsButton.clicked.connect(self.openGemDialog)
 
         # populate the player gems table
         data: list = [["", self.gameActions.currentPlayer.gems]]
-
-        headersList = self._headers
-        headersList.append(Color.GOLD)
         self._playerGemModel = TokenStoreModel(data, headersList, [0])
         self.playerGemsTable.setModel(self._playerGemModel)
 
@@ -133,18 +138,6 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
     def refreshPlayerGems(self):
         data: list = [["Currently held", self.gameActions.currentPlayer.gems]]
         self._playerGemModel.refreshData(data)
-
-    def onActionSelected(self, index):
-        print(f"dd changed to {index}")
-        match index:
-            case 0:
-                pass
-            case 1:
-                self.openGemDialog()
-            case 2:
-                pass
-            case _:
-                pass
 
     def openGemDialog(self):
 
