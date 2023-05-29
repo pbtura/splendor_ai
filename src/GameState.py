@@ -208,13 +208,13 @@ class GameState(object):
         self.availableResources.get(deck).append(replacementCard)
         # print(self.availableResources)
         
-    def reserveCard(self, player: Player, deck: int, cardIdx: int):
+    def reserveCard(self, player: Player, deck: int, card: ResourceCard):
         
         #check how many reserved cards the player currently has
         if( len(player.reservedCards) >= 3):
             raise RuntimeError("A player cannot reserve more than three cards at once.")
         
-        card:ResourceCard = self.availableResources.get(deck).pop(cardIdx)
+        self.availableResources.get(deck).remove(card)
         replacementCard:ResourceCard = self.resourceDeck.get(deck).popleft()
         
         #transfer a gold token to the player

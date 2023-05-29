@@ -85,6 +85,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
 
         # setup the purchase and reserve buttons
         self.purchaseCardButton.clicked.connect(self.purchaseButtonClicked)
+        self.reserveCardButton.clicked.connect(self.reserveCardButtonClicked)
 
         self.updatePlayerData()
 
@@ -116,12 +117,17 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
     def purchaseButtonClicked(self):
         self.openPurchaseCardDialog(self.selectedCard)
 
+    def reserveCardButtonClicked(self):
+        self.gameActions.reserveCard(self.selectedCard.level, self.selectedCard)
+        self.updatePlayerData()
+
     def updatePlayerData(self):
         player = self.gameActions.currentPlayer
         self.playerName.setText(player.name)
         self.currentPointsLabel.setText(str(player.getTotalPoints()))
         self._playerCardsModel = ResourceCardModel(player.cards)
         self.purchasedCardsTable.setModel(self._playerCardsModel)
+        self.reservedCardsTable.setModel(ResourceCardModel(player.reservedCards))
         self.refreshPlayerGems()
 
     def refreshPlayerGems(self):

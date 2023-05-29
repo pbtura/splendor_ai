@@ -16,7 +16,7 @@ class Player(object):
 
     gems: PlayerTokenStore
     cards: list[ResourceCard]
-    reservedCards: Iterable[ResourceCard]
+    reservedCards: list[ResourceCard]
     nobles: Iterable[NobleCard]
     
     def __init__(self, playerName: str):

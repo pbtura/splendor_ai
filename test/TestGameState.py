@@ -371,7 +371,7 @@ class TestGameState(TestGame):
 
     def testWithdrawPlayerGems(self):
         game: GameState = self.createGame()
-        player: Player = game.players.get(0)
+        player: Player = game.players[0]
         # setup the player with enough gems for the purchase
         game.withdrawGems(player, {Color.WHITE: 1, Color.BLUE: 1, Color.GREEN: 1})
         game.withdrawGems(player, {Color.WHITE: 1, Color.RED: 1, Color.BLACK: 1})
@@ -450,7 +450,7 @@ class TestGameState(TestGame):
         
         expectedReplacement: ResourceCard = game.resourceDeck.get(deckKey)[0]
         
-        game.reserveCard(player, deckKey, cardIdx)
+        game.reserveCard(player, deckKey, expected)
         
         #check that a gold token was transferred from the bank to the player
         self.assertDictEqual({Color.WHITE: 0, Color.BLUE: 0, Color.GREEN: 0, Color.RED: 0, Color.BLACK: 0, Color.GOLD: 1}, player.gems.tokens)
@@ -472,13 +472,19 @@ class TestGameState(TestGame):
         player: Player = game.players[0]
         deckKey: int = 1
         cardIdx: int = 0
-        
-        game.reserveCard(player, deckKey, cardIdx)
-        game.reserveCard(player, deckKey, cardIdx)
-        game.reserveCard(player, deckKey, cardIdx)
+        expected: ResourceCard = game.availableResources.get(deckKey)[cardIdx]
+
+        game.reserveCard(player, deckKey, expected)
+
+        expected: ResourceCard = game.availableResources.get(deckKey)[cardIdx]
+        game.reserveCard(player, deckKey, expected)
+
+        expected: ResourceCard = game.availableResources.get(deckKey)[cardIdx]
+        game.reserveCard(player, deckKey, expected)
         
         with self.assertRaises(RuntimeError) as context:
-            game.reserveCard(player, deckKey, cardIdx)
+            expected: ResourceCard = game.availableResources.get(deckKey)[cardIdx]
+            game.reserveCard(player, deckKey, expected)
         self.assertEqual("A player cannot reserve more than three cards at once.", str(context.exception))
         
     def testClaimReservedCard(self):
@@ -491,14 +497,14 @@ class TestGameState(TestGame):
         #Level    Gem color    PV    (w)hite    bl(u)e    (g)reen    (r)ed    blac(k)                                                                
         #    1    BLACK        0     1          1         1          1        0                                                                
         expected: ResourceCard = game.availableResources.get(deckKey)[cardIdx]
-        gems:dict = {Color.WHITE: expected.cost.white, Color.BLUE: expected.cost.blue, Color.GREEN: expected.cost.green, Color.RED: expected.cost.red, Color.BLACK: expected.cost.black, Color.GOLD: 0}
+        gems: dict = {Color.WHITE: expected.cost.white, Color.BLUE: expected.cost.blue, Color.GREEN: expected.cost.green, Color.RED: expected.cost.red, Color.BLACK: expected.cost.black, Color.GOLD: 0}
 
         #setup the player with enough gems for the purchase
         game.withdrawGems(player, {Color.WHITE: 1, Color.BLUE:1, Color.GREEN:1})
         game.withdrawGems(player, {Color.WHITE: 1, Color.RED:1, Color.BLACK:1})
         
         #reserve the card
-        game.reserveCard(player, deckKey, cardIdx)
+        game.reserveCard(player, deckKey, expected)
         
         #claim the reserved card
         game.claimReservedCard(player, cardIdx, gems)
@@ -567,13 +573,14 @@ class TestGameState(TestGame):
         
         deckKey: int = 1
         cardIdx: int = 0
-        
+
+        expected: ResourceCard = game.availableResources.get(deckKey)[cardIdx]
         #setup the player with enough gems for the purchase
         game.withdrawGems(player, {Color.WHITE: 1, Color.BLUE:1, Color.GREEN:1})
         game.withdrawGems(player, {Color.WHITE: 1, Color.RED:1, Color.GREEN:1})
         
         #reserve a card to add a gold gem
-        game.reserveCard(player, deckKey, cardIdx)
+        game.reserveCard(player, deckKey, expected)
         
         #test a card affordable without gold
         #Level    Gem color    PV    (w)hite    bl(u)e    (g)reen    (r)ed    blac(k)                                                                
@@ -591,13 +598,14 @@ class TestGameState(TestGame):
         
         deckKey: int = 1
         cardIdx: int = 0
-        
+        expected: ResourceCard = game.availableResources.get(deckKey)[cardIdx]
+
         #setup the player with enough gems for the purchase
         game.withdrawGems(player, {Color.WHITE: 1, Color.BLUE:1, Color.GREEN:1})
         game.withdrawGems(player, {Color.WHITE: 1, Color.RED:1, Color.GREEN:1})
         
         #reserve a card to add a gold gem
-        game.reserveCard(player, deckKey, cardIdx)         
+        game.reserveCard(player, deckKey, expected)
         
         #test a card that is not affordable
         #Level    Gem color    PV    (w)hite    bl(u)e    (g)reen    (r)ed    blac(k)                                                                
@@ -615,13 +623,14 @@ class TestGameState(TestGame):
         
         deckKey: int = 1
         cardIdx: int = 0
-        
+        expected: ResourceCard = game.availableResources.get(deckKey)[cardIdx]
+
         #setup the player enough gems for the purchase
         game.withdrawGems(player, {Color.WHITE: 1, Color.BLUE:1, Color.GREEN:1})
         game.withdrawGems(player, {Color.WHITE: 1, Color.RED:1, Color.GREEN:1})
         
         #reserve a card to add a gold gem
-        game.reserveCard(player, deckKey, cardIdx)       
+        game.reserveCard(player, deckKey, expected)
         
         #test a card affordable if gold is used
         #Level    Gem color    PV    (w)hite    bl(u)e    (g)reen    (r)ed    blac(k)                                                                
@@ -668,13 +677,14 @@ class TestGameState(TestGame):
         
         deckKey: int = 1
         cardIdx: int = 0
-        
+        expected: ResourceCard = game.availableResources.get(deckKey)[cardIdx]
+
         #setup the player with enough gems for the purchase
         game.withdrawGems(player, {Color.WHITE: 1, Color.BLUE:1, Color.GREEN:1})
         game.withdrawGems(player, {Color.WHITE: 1, Color.RED:1, Color.GREEN:1})
         
         #reserve a card to add a gold gem
-        game.reserveCard(player, deckKey, cardIdx)         
+        game.reserveCard(player, deckKey, expected)
                
         results: [ResourceCard] = GameState.findAvailableResources(player.gems, game.availableResources, list(player.getResourceTotals().values()))
         print(results)

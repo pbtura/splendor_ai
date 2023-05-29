@@ -99,4 +99,7 @@ class GameActions(object):
         
     def purchaseCard(self, deck: int, card: ResourceCard, gems: TokenStore):
         self.game.purchaseCard(self.currentPlayer, deck, card, gems)
+
+    def reserveCard(self, deck: int, card: ResourceCard):
+        self.game.reserveCard(self.currentPlayer, deck, card)
     
