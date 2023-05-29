@@ -3,7 +3,7 @@ Created on Apr 11, 2023
 
 @author: bucpa
 '''
-from TokenStore import TokenStore
+from PlayerTokenStore import PlayerTokenStore
 from ResourceCard import ResourceCard
 from NobleCard import NobleCard
 from Color import Color
@@ -14,18 +14,18 @@ class Player(object):
     classdocs
     '''
 
-    gems: TokenStore
+    gems: PlayerTokenStore
     cards: list[ResourceCard]
-    reservedCards: Iterable[ResourceCard]
+    reservedCards: list[ResourceCard]
     nobles: Iterable[NobleCard]
     
-    def __init__(self, playerName: str ):
+    def __init__(self, playerName: str):
         '''
         Constructor
         '''
-        self.turnsTaken = 0;
-        self.name = playerName;
-        self.gems = TokenStore(0,0,0,0,0,0)
+        self.turnsTaken = 0
+        self.name = playerName
+        self.gems = PlayerTokenStore(0,0,0,0,0,0)
         self.cards = []
         self.reservedCards = []
         self.nobles = []
@@ -38,7 +38,15 @@ class Player(object):
             totals[card.suit] = t
             
         return totals
+    
+    def getTotalPoints(self):
         
+        total: int = 0
+        for card in self.cards:
+            total += card.points
+        
+        return total
+
     def __str__(self)->str:
         return f"name:{self.name}, turns taken:{self.turnsTaken}, gems:{self.gems}, resources:{self.cards}, reserved cards:{self.reservedCards}, nobles:{self.nobles}"
         

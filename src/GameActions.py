@@ -4,42 +4,49 @@ Created on Apr 14, 2023
 @author: bucpa
 '''
 import numpy as np
+import os
 from pynput.keyboard import Listener 
 
 from itertools import cycle
+
+import ResourceCard
+import TokenStore
 from GameState import GameState
 from Player import Player
 from typing import Iterable
+
 
 class GameActions(object):
     '''
     classdocs
     '''
     
-    game:GameState
-    players:cycle
-    currentPlayer:Player
-    listener:Listener
+    game: GameState
+    players: cycle
+    currentPlayer: Player
+    listener: Listener
     listening: bool = 0
    
-    def __init__(self, names: Iterable[str], randomize: bool = 1):
+    def __init__(self, names: Iterable[str], randomize: bool = 1, cardsPath: str = os.path.join('..', '..', 'resources', 'cards_list.csv'), noblesPath: str = os.path.join('..','..','resources','nobles_list.csv')):
         '''
         Constructor
         '''
-        self.game = GameState()
+        self.game = GameState(cardsPath, noblesPath)
         self.game.setupGame(names)
         self.game.startNewGame(randomize)
         self.players = cycle(self.game.players)
+        self.currentPlayer = next(self.players)
+        # self.listener = Listener(
+        #     on_press = self.on_press
+        # )
         
-        self.listener = Listener(
-            on_press = self.on_press
-        )
-        
+    def getPlayersList(self)->list:
+        return self.game.players
+    
     def promptUser(self):
         print("Choose an action: 1)list available cards, 2)take gems, 3)buy card, 4)reserve card 5)list affordable cards q)end turn 0)cancel  ")
         self.listener.start()
         self.listener.join()
-        
 
     def on_press(self,key):
         print("Key pressed: {0}".format(key))
@@ -64,16 +71,16 @@ class GameActions(object):
                     pass
 
     def takeTurn(self):
-        if not(self.listening):
-            self.listening = 1
+        if not self.listening:
+            self.listening = True
             self.promptUser()
         self.currentPlayer = next(self.players)
         print(f"player {self.currentPlayer.name}, it is your turn")
     
-    def findAffordableCards(self)->list:  
+    def findAffordableCards(self) -> list:
         gems = self.currentPlayer.gems
         resources = self.game.availableResources
-        discounts = list( self.currentPlayer.getResourceTotals().values() )
+        discounts = list(self.currentPlayer.getResourceTotals().values())
         result = self.game.findAvailableResources(gems, resources, discounts)
         
         return result  
@@ -86,6 +93,13 @@ class GameActions(object):
     def listAvailableNobles(self):
         for x, y in enumerate(self.game.availableNobles):
             print(f"Noble {x}: {y}")
+            
+    def withdrawGems(self, gems: dict):
+        self.game.withdrawGems(self.currentPlayer, gems)
+        
+    def purchaseCard(self, deck: int, card: ResourceCard, gems: TokenStore):
+        self.game.purchaseCard(self.currentPlayer, deck, card, gems)
 
-
+    def reserveCard(self, deck: int, card: ResourceCard):
+        self.game.reserveCard(self.currentPlayer, deck, card)
     

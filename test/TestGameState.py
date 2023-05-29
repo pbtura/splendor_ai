@@ -20,11 +20,14 @@ class TestGameState(TestGame):
 
     INITIAL_GEMS: dict = {Color.WHITE:7, Color.BLUE: 7, Color.GREEN:7, Color.RED: 7, Color.BLACK: 7, Color.GOLD:5} 
 
+    game: GameState
+    
     def setUp(self):
+        self.game: GameState = GameState( os.path.join('..','resources','cards_list.csv'), os.path.join('..','resources','nobles_list.csv'))
         pass
 
-
     def tearDown(self):
+        self.game = None
         pass
 
     def assertResourceCardsEqual(self,expected:ResourceCard, actual:ResourceCard):
@@ -59,7 +62,7 @@ class TestGameState(TestGame):
         pass
     
     def testInitializeResourceDeck(self):
-        game: GameState = GameState()
+        game: GameState = self.game
         game.initializeResourceDecks()
         
         self.assertResourceDeckInitialized(game.resourceDeck)
@@ -67,7 +70,7 @@ class TestGameState(TestGame):
     
     def testInitializeAvailableGemsForTwoPlayers(self):
         
-        game: GameState = GameState()
+        game: GameState = self.game
         game.addPlayers(["a", "b"])
         game.initializeAvailableGems()
         
@@ -76,7 +79,7 @@ class TestGameState(TestGame):
     
     def testInitializeAvailableGemsForThreePlayers(self):
         
-        game: GameState = GameState()
+        game: GameState = self.game
         game.addPlayers(["a", "b", "c"])
         game.initializeAvailableGems()
         
@@ -85,7 +88,7 @@ class TestGameState(TestGame):
     
     def testInitializeAvailableGemsForFourPlayers(self):
         
-        game: GameState = GameState()
+        game: GameState = self.game
         game.addPlayers(["a", "b", "c", "d"])
         game.initializeAvailableGems()
         
@@ -111,14 +114,14 @@ class TestGameState(TestGame):
         pass
     
     def testInitializeNobleDeck(self):
-        game: GameState = GameState()
+        game: GameState = self.game
         game.initializeNobleDeck()
         
         self.assertNobleDeckInitialized(game.noblesDeck)
         pass
     
     def testAddPlayers(self):
-        game: GameState = GameState()
+        game: GameState = self.game
         playerNames = ["playerA", "playerB"]
         game.addPlayers(playerNames)
         self.assertIsNotNone(game.players)
@@ -131,7 +134,7 @@ class TestGameState(TestGame):
     
     def testDealResourceCards(self):
         
-        game: GameState = GameState()
+        game: GameState = self.game
         game.initializeResourceDecks()
         deck1: list[ResourceCard] = game.resourceDeck.get(1)
         expected1: list[ResourceCard] = [deck1[0], deck1[1], deck1[2], deck1[3]]
@@ -141,14 +144,14 @@ class TestGameState(TestGame):
         #have been moved to the availableResources deck
         self.assertEqual(36, len(game.resourceDeck.get(1)))
         actualDeck1:list = game.availableResources.get(1)
-        self.assertEquals(4, len(actualDeck1))
+        self.assertEqual(4, len(actualDeck1))
         for idx, card in enumerate(actualDeck1):
             self.assertResourceCardsEqual(expected1[idx], card)
             
         pass
     
     def testDealNobleCards(self):
-        game: GameState = GameState()
+        game: GameState = self.game
         game.initializeNobleDeck()
         game.dealNobleCards(4);
         
@@ -157,7 +160,7 @@ class TestGameState(TestGame):
         pass
     
     def testDealNobleCardsForThreePlayers(self):
-        game: GameState = GameState()
+        game: GameState = self.game
         game.initializeNobleDeck()
         game.dealNobleCards(3);
         
@@ -166,7 +169,7 @@ class TestGameState(TestGame):
         pass
     
     def testDealNobleCardsForTwoPlayers(self):
-        game: GameState = GameState()
+        game: GameState = self.game
         game.initializeNobleDeck()
         game.dealNobleCards(2);
         
@@ -175,7 +178,7 @@ class TestGameState(TestGame):
         pass
        
     def testInitializeAvailableResourceCards(self):
-        game: GameState = GameState()
+        game: GameState = self.game
         game.initializeResourceDecks()
         deck1: list[ResourceCard] = game.resourceDeck.get(1)
         deck2: list[ResourceCard] = game.resourceDeck.get(2)
@@ -196,7 +199,7 @@ class TestGameState(TestGame):
 
     def testSetupGame(self):
         names: list = ["playerA", "playerB", "playerC", "playerD"]
-        game: GameState = GameState()
+        game: GameState = self.game
         game.setupGame(names)
         
         #check players were initialized
@@ -216,7 +219,7 @@ class TestGameState(TestGame):
     def testStartNewGame(self):
         
         names: list = ["playerA", "playerB", "playerC", "playerD"]
-        game: GameState = GameState()
+        game: GameState = self.game
         game.setupGame(names)
         
         game.startNewGame(1)
@@ -242,7 +245,7 @@ class TestGameState(TestGame):
     
     def createGame(self) -> GameState:
         names: list = ["playerA", "playerB", "playerC", "playerD"]
-        game: GameState = GameState()
+        game: GameState = GameState( os.path.join('..','resources','cards_list.csv'), os.path.join('..','resources','nobles_list.csv'))
         game.setupGame(names)
         game.startNewGame(0)
         
@@ -254,17 +257,18 @@ class TestGameState(TestGame):
         player: Player = game.players[0]
 
         #(white, blue, green, red, black)
-        expectedCost:dict = {Color.BLUE: 1, Color.RED: 1, Color.BLACK: 1}
+        expectedCost:dict = {Color.WHITE: 0, Color.BLUE: 1, Color.RED: 1, Color.BLACK: 1}
         
         game.withdrawGems(player, expectedCost)
         actualPlayer = game.players[0]
         
         for x in expectedCost.keys():
+            print(x)
             #check that the gems were withdrawn from the game store
-            self.assertEquals( 6, game.availableGems.tokens.get(x))
+            self.assertEqual( 7-expectedCost.get(x), game.availableGems.tokens.get(x))
             
             #check that the gems were added to the player store
-            self.assertEqual(1, actualPlayer.gems.tokens.get(x))
+            self.assertEqual(expectedCost.get(x), actualPlayer.gems.tokens.get(x))
         
               
         pass
@@ -281,24 +285,21 @@ class TestGameState(TestGame):
         
         for x in expectedCost.keys():
             #check that the gems were withdrawn from the game store
-            self.assertEquals( 5, game.availableGems.tokens.get(x))
+            self.assertEqual( 5, game.availableGems.tokens.get(x))
             
             #check that the gems were added to the player store
             self.assertEqual(2, actualPlayer.gems.tokens.get(x))
         
-              
-        pass
-        
-    def testWitdrawTooManyGems(self):
+    def testWithdrawTooManyGems(self):
         game: GameState = self.createGame()
         player: Player = game.players[0]
 
         #(white, blue, green, red, black)
-        expectedCost:dict = {Color.WHITE: 1, Color.BLUE: 1, Color.RED: 1, Color.BLACK: 1}              
+        expectedCost:dict = {Color.WHITE: 1, Color.BLUE: 2}              
         
         with self.assertRaises(RuntimeError) as context:
             game.withdrawGems(player, expectedCost)
-        self.assertEqual("No more than three gems may be withdrawn from the bank.", str(context.exception))             
+        self.assertEqual("Invalid withdraw. Valid combinations are 2 of a single color or one each of 3 different colors.", str(context.exception))             
     
     def testWithdrawMoreGemsThanAvailable(self):
         game: GameState = self.createGame()
@@ -349,8 +350,8 @@ class TestGameState(TestGame):
         expectedReplacement: ResourceCard = game.resourceDeck.get(deckKey)[0]
         gems:dict = {Color.WHITE: expected.cost.white, Color.BLUE: expected.cost.blue, Color.GREEN: expected.cost.green, Color.RED: expected.cost.red, Color.BLACK: expected.cost.black, Color.GOLD: 0}
         
-        game.purchaseCard(player, deckKey, cardIdx, gems)
-        actualPlayer:Player = game.players[0] 
+        game.purchaseCard(player, deckKey, expected, gems)
+        actualPlayer: Player = game.players[0]
         
         #check that the card was transferred to the player
         self.assertEqual(1, len(actualPlayer.cards))
@@ -367,7 +368,18 @@ class TestGameState(TestGame):
         self.assertIn(expectedReplacement, game.availableResources.get(deckKey))
         
         pass
-    
+
+    def testWithdrawPlayerGems(self):
+        game: GameState = self.createGame()
+        player: Player = game.players[0]
+        # setup the player with enough gems for the purchase
+        game.withdrawGems(player, {Color.WHITE: 1, Color.BLUE: 1, Color.GREEN: 1})
+        game.withdrawGems(player, {Color.WHITE: 1, Color.RED: 1, Color.BLACK: 1})
+
+        player.gems.withdrawTokens({Color.WHITE: 2})
+        self.assertDictEqual({Color.WHITE: 0, Color.BLUE: 1, Color.GREEN: 1, Color.RED: 1, Color.BLACK: 1, Color.GOLD: 0}, player.gems.tokens)
+        pass
+
     def testPurchaseCardUsingGold(self):
         
         game: GameState = self.createGame()
@@ -386,7 +398,7 @@ class TestGameState(TestGame):
         expectedReplacement: ResourceCard = game.resourceDeck.get(deckKey)[0]
         gems:TokenStore = {Color.WHITE: 0, Color.BLUE: expected.cost.blue, Color.GREEN: expected.cost.green, Color.RED: expected.cost.red, Color.BLACK: expected.cost.black, Color.GOLD: 1}
         
-        game.purchaseCard(player, deckKey, cardIdx, gems)
+        game.purchaseCard(player, deckKey, expected, gems)
         actualPlayer:Player = game.players[0] 
         
         #check that the card was transferred to the player
@@ -421,7 +433,7 @@ class TestGameState(TestGame):
         gems:dict = {Color.WHITE: expected.cost.white, Color.BLUE: expected.cost.blue, Color.GREEN: expected.cost.green, Color.RED: expected.cost.red, Color.BLACK: expected.cost.black, Color.GOLD: 0}
         
         with self.assertRaises(RuntimeError) as context:
-            game.purchaseCard(player, deckKey, cardIdx, gems)
+            game.purchaseCard(player, deckKey, expected, gems)
         self.assertEqual("Cannot remove more gems than are in the store.", str(context.exception))
         pass
     
@@ -438,7 +450,7 @@ class TestGameState(TestGame):
         
         expectedReplacement: ResourceCard = game.resourceDeck.get(deckKey)[0]
         
-        game.reserveCard(player, deckKey, cardIdx)
+        game.reserveCard(player, deckKey, expected)
         
         #check that a gold token was transferred from the bank to the player
         self.assertDictEqual({Color.WHITE: 0, Color.BLUE: 0, Color.GREEN: 0, Color.RED: 0, Color.BLACK: 0, Color.GOLD: 1}, player.gems.tokens)
@@ -460,13 +472,19 @@ class TestGameState(TestGame):
         player: Player = game.players[0]
         deckKey: int = 1
         cardIdx: int = 0
-        
-        game.reserveCard(player, deckKey, cardIdx)
-        game.reserveCard(player, deckKey, cardIdx)
-        game.reserveCard(player, deckKey, cardIdx)
+        expected: ResourceCard = game.availableResources.get(deckKey)[cardIdx]
+
+        game.reserveCard(player, deckKey, expected)
+
+        expected: ResourceCard = game.availableResources.get(deckKey)[cardIdx]
+        game.reserveCard(player, deckKey, expected)
+
+        expected: ResourceCard = game.availableResources.get(deckKey)[cardIdx]
+        game.reserveCard(player, deckKey, expected)
         
         with self.assertRaises(RuntimeError) as context:
-            game.reserveCard(player, deckKey, cardIdx)
+            expected: ResourceCard = game.availableResources.get(deckKey)[cardIdx]
+            game.reserveCard(player, deckKey, expected)
         self.assertEqual("A player cannot reserve more than three cards at once.", str(context.exception))
         
     def testClaimReservedCard(self):
@@ -479,14 +497,14 @@ class TestGameState(TestGame):
         #Level    Gem color    PV    (w)hite    bl(u)e    (g)reen    (r)ed    blac(k)                                                                
         #    1    BLACK        0     1          1         1          1        0                                                                
         expected: ResourceCard = game.availableResources.get(deckKey)[cardIdx]
-        gems:dict = {Color.WHITE: expected.cost.white, Color.BLUE: expected.cost.blue, Color.GREEN: expected.cost.green, Color.RED: expected.cost.red, Color.BLACK: expected.cost.black, Color.GOLD: 0}
+        gems: dict = {Color.WHITE: expected.cost.white, Color.BLUE: expected.cost.blue, Color.GREEN: expected.cost.green, Color.RED: expected.cost.red, Color.BLACK: expected.cost.black, Color.GOLD: 0}
 
         #setup the player with enough gems for the purchase
         game.withdrawGems(player, {Color.WHITE: 1, Color.BLUE:1, Color.GREEN:1})
         game.withdrawGems(player, {Color.WHITE: 1, Color.RED:1, Color.BLACK:1})
         
         #reserve the card
-        game.reserveCard(player, deckKey, cardIdx)
+        game.reserveCard(player, deckKey, expected)
         
         #claim the reserved card
         game.claimReservedCard(player, cardIdx, gems)
@@ -555,13 +573,14 @@ class TestGameState(TestGame):
         
         deckKey: int = 1
         cardIdx: int = 0
-        
+
+        expected: ResourceCard = game.availableResources.get(deckKey)[cardIdx]
         #setup the player with enough gems for the purchase
         game.withdrawGems(player, {Color.WHITE: 1, Color.BLUE:1, Color.GREEN:1})
         game.withdrawGems(player, {Color.WHITE: 1, Color.RED:1, Color.GREEN:1})
         
         #reserve a card to add a gold gem
-        game.reserveCard(player, deckKey, cardIdx)
+        game.reserveCard(player, deckKey, expected)
         
         #test a card affordable without gold
         #Level    Gem color    PV    (w)hite    bl(u)e    (g)reen    (r)ed    blac(k)                                                                
@@ -579,13 +598,14 @@ class TestGameState(TestGame):
         
         deckKey: int = 1
         cardIdx: int = 0
-        
+        expected: ResourceCard = game.availableResources.get(deckKey)[cardIdx]
+
         #setup the player with enough gems for the purchase
         game.withdrawGems(player, {Color.WHITE: 1, Color.BLUE:1, Color.GREEN:1})
         game.withdrawGems(player, {Color.WHITE: 1, Color.RED:1, Color.GREEN:1})
         
         #reserve a card to add a gold gem
-        game.reserveCard(player, deckKey, cardIdx)         
+        game.reserveCard(player, deckKey, expected)
         
         #test a card that is not affordable
         #Level    Gem color    PV    (w)hite    bl(u)e    (g)reen    (r)ed    blac(k)                                                                
@@ -603,13 +623,14 @@ class TestGameState(TestGame):
         
         deckKey: int = 1
         cardIdx: int = 0
-        
+        expected: ResourceCard = game.availableResources.get(deckKey)[cardIdx]
+
         #setup the player enough gems for the purchase
         game.withdrawGems(player, {Color.WHITE: 1, Color.BLUE:1, Color.GREEN:1})
         game.withdrawGems(player, {Color.WHITE: 1, Color.RED:1, Color.GREEN:1})
         
         #reserve a card to add a gold gem
-        game.reserveCard(player, deckKey, cardIdx)       
+        game.reserveCard(player, deckKey, expected)
         
         #test a card affordable if gold is used
         #Level    Gem color    PV    (w)hite    bl(u)e    (g)reen    (r)ed    blac(k)                                                                
@@ -656,13 +677,14 @@ class TestGameState(TestGame):
         
         deckKey: int = 1
         cardIdx: int = 0
-        
+        expected: ResourceCard = game.availableResources.get(deckKey)[cardIdx]
+
         #setup the player with enough gems for the purchase
         game.withdrawGems(player, {Color.WHITE: 1, Color.BLUE:1, Color.GREEN:1})
         game.withdrawGems(player, {Color.WHITE: 1, Color.RED:1, Color.GREEN:1})
         
         #reserve a card to add a gold gem
-        game.reserveCard(player, deckKey, cardIdx)         
+        game.reserveCard(player, deckKey, expected)
                
         results: [ResourceCard] = GameState.findAvailableResources(player.gems, game.availableResources, list(player.getResourceTotals().values()))
         print(results)
@@ -678,7 +700,7 @@ class TestGameState(TestGame):
         
         #setup the player with enough gems for the purchase
         player.gems = TokenStore(2, 1, 0, 1, 2, 1)
-        
+
         #add enough cards to the player to reduce the cost of the card being
         #purchased to an affordable state
         crd1: ResourceCard = ResourceCard(1, Color.RED, Cost(3,0,0,0,0) ,0)

@@ -3,7 +3,6 @@ Created on Apr 11, 2023
 
 @author: bucpa
 '''
-import os
 import csv
 import random
 from collections import deque
@@ -17,31 +16,34 @@ from ResourceCard import ResourceCard
 from Color import Color
 from Player import Player
 from GemCollection import GemCollection
+from numpy import ndarray
+
 
 class GameState(object):
     '''
     classdocs
     '''
 
-
-    players: Iterable[Player]
-    availableGems:TokenStore
-    availableNobles:Iterable[NobleCard]
-    noblesDeck:deque[NobleCard]
+    players: list[Player]
+    availableGems: TokenStore
+    availableNobles: Iterable[NobleCard]
+    noblesDeck: deque[NobleCard]
     
-    availableResources:dict[int,list[ResourceCard]]
-    resourceDeck:dict[int, deque[ResourceCard]]
+    availableResources: dict[int,ndarray[ResourceCard]]
+    resourceDeck: dict[int, deque[ResourceCard]]
     
-    playersRandomized:bool = 0
-    resourcesShuffled:bool = 0
-    noblesShuffled:bool = 0
+    playersRandomized: bool = 0
+    resourcesShuffled: bool = 0
+    noblesShuffled: bool = 0
     
-    def __init__(self):
+    def __init__(self, cardsPath: str, noblesPath: str):
         '''
         Constructor
         '''
         self.availableResources = {1: [], 2: [], 3: []}
         self.noblesDeck = deque()
+        self.cardsPath = cardsPath
+        self.noblesPath = noblesPath
     
     def setupGame(self, names:list[str]):
         #initialize players
@@ -85,24 +87,24 @@ class GameState(object):
     def addPlayers(self, names:list[str]):
         self.players = []
         for name in names:
-            player:Player = Player(name)
+            player: Player = Player(name)
             self.players.append(player)
                 
     def initializeResourceDecks(self):  
         
         self.resourceDeck = {}
-        with open(os.path.join('..','resources','cards_list.csv'), newline='') as f:
+        with open(self.cardsPath, newline='') as f:
             reader = csv.DictReader(f)
             self.resourceDeck = GameState.importResourceDecks(reader)
     
     def initializeNobleDeck(self):
         self.noblesDeck = []
-        with open(os.path.join('..','resources','nobles_list.csv'), newline='') as f:
+        with open(self.noblesPath, newline='') as f:
             reader = csv.DictReader(f)
             self.noblesDeck = GameState.importNobleDeck(reader)
     
     def dealResourceCards(self, level: int, numberOfCards: int):
-        available:list = self.availableResources.get(level)
+        available: list = self.availableResources.get(level)
 
         i: int = 0;
         cards: deque = self.resourceDeck.get(level)
@@ -124,8 +126,7 @@ class GameState(object):
         self.dealResourceCards(1, 4)
         self.dealResourceCards(2, 4)
         self.dealResourceCards(3, 4)
-        
-          
+
     def initializeAvailableGems(self):
         numberOfPlayers: int = len(self.players)
         match numberOfPlayers:
@@ -137,8 +138,7 @@ class GameState(object):
                 self.availableGems = TokenStore(4,4,4,4,4,5)
             case _:
                 self.availableGems = None
-       
-    
+
     @staticmethod
     def parseResourceRow(rowData: Iterable)->ResourceCard:
         row = dict(rowData)
@@ -152,7 +152,6 @@ class GameState(object):
     @staticmethod
     def importResourceDecks(reader) -> dict:       
         decks: dict = {1: deque(), 2: deque(), 3: deque()}
-
 
         for row in reader:
             #print(row)               
@@ -182,16 +181,21 @@ class GameState(object):
     
     def withdrawGems(self, player:Player, gems: dict):
         
-        if(len(gems) > 3):
-            raise RuntimeError("No more than three gems may be withdrawn from the bank.")
+        total: int = 0
+        for x in gems.values():
+            if(total >=1 and x > 1):
+                raise RuntimeError("Invalid withdraw. Valid combinations are 2 of a single color or one each of 3 different colors.")
+            total += x
+            if(x > 3):
+                raise RuntimeError("No more than three gems may be withdrawn from the bank.")
 
         self.availableGems.withdrawTokens(gems);
         player.gems.depositTokens(gems)       
     
-    def purchaseCard(self, player:Player, deck: int, cardIdx: int, gems: TokenStore):     
+    def purchaseCard(self, player: Player, deck: int, card: ResourceCard, gems: dict):
         
-        card:ResourceCard = self.availableResources.get(deck).pop(cardIdx)
-        replacementCard:ResourceCard = self.resourceDeck.get(deck).popleft()
+        self.availableResources.get(deck).remove(card)
+        replacementCard: ResourceCard = self.resourceDeck.get(deck).popleft()
               
         #transfer the gems from the player to the bank
         player.gems.withdrawTokens(gems)
@@ -204,13 +208,13 @@ class GameState(object):
         self.availableResources.get(deck).append(replacementCard)
         # print(self.availableResources)
         
-    def reserveCard(self, player:Player, deck: int, cardIdx: int):   
+    def reserveCard(self, player: Player, deck: int, card: ResourceCard):
         
         #check how many reserved cards the player currently has
         if( len(player.reservedCards) >= 3):
             raise RuntimeError("A player cannot reserve more than three cards at once.")
         
-        card:ResourceCard = self.availableResources.get(deck).pop(cardIdx)
+        self.availableResources.get(deck).remove(card)
         replacementCard:ResourceCard = self.resourceDeck.get(deck).popleft()
         
         #transfer a gold token to the player
