@@ -159,7 +159,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
         for x, y in enumerate(self._headers):
             index: QModelIndex = self.tokenModel.index(0, x)
             model = index.data(Qt.EditRole)
-            print(f"{y}:{model}")
+            # print(f"{y}:{model}")
             gems[y] = model
 
         try:
@@ -183,8 +183,26 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
         self.tokenModel = TokenStoreModel(data, self._headers, [0, 0, 1])
 
         dlg = GemDialog(self)
-        dlg.save.connect(self.handleGemsUpdated)
+        dlg.save.connect(self.handleCardPurchased)
         dlg.exec()
+
+    def handleCardPurchased(self, parent):
+
+        gems = {}
+        for x, y in enumerate(self._headers):
+            index: QModelIndex = self.tokenModel.index(2, x)
+            model = index.data(Qt.EditRole)
+            # print(f"{y}:{model}")
+            gems[y] = model
+
+        try:
+            self.gameActions.purchaseCard(self.selectedCard.level, self.selectedCard, gems)
+            parent.close()
+            self.refreshPlayerGems()
+        except RuntimeError as e:
+            print(e)
+            errorDialog = QtWidgets.QErrorMessage(parent)
+            errorDialog.showMessage(str(e))
 
 
 if QtCore.QT_VERSION >= 0x50501:

@@ -144,7 +144,7 @@ class TestGameState(TestGame):
         #have been moved to the availableResources deck
         self.assertEqual(36, len(game.resourceDeck.get(1)))
         actualDeck1:list = game.availableResources.get(1)
-        self.assertEquals(4, len(actualDeck1))
+        self.assertEqual(4, len(actualDeck1))
         for idx, card in enumerate(actualDeck1):
             self.assertResourceCardsEqual(expected1[idx], card)
             
@@ -265,7 +265,7 @@ class TestGameState(TestGame):
         for x in expectedCost.keys():
             print(x)
             #check that the gems were withdrawn from the game store
-            self.assertEquals( 7-expectedCost.get(x), game.availableGems.tokens.get(x))
+            self.assertEqual( 7-expectedCost.get(x), game.availableGems.tokens.get(x))
             
             #check that the gems were added to the player store
             self.assertEqual(expectedCost.get(x), actualPlayer.gems.tokens.get(x))
@@ -285,15 +285,12 @@ class TestGameState(TestGame):
         
         for x in expectedCost.keys():
             #check that the gems were withdrawn from the game store
-            self.assertEquals( 5, game.availableGems.tokens.get(x))
+            self.assertEqual( 5, game.availableGems.tokens.get(x))
             
             #check that the gems were added to the player store
             self.assertEqual(2, actualPlayer.gems.tokens.get(x))
         
-              
-        pass
-        
-    def testWitdrawTooManyGems(self):
+    def testWithdrawTooManyGems(self):
         game: GameState = self.createGame()
         player: Player = game.players[0]
 
@@ -353,8 +350,8 @@ class TestGameState(TestGame):
         expectedReplacement: ResourceCard = game.resourceDeck.get(deckKey)[0]
         gems:dict = {Color.WHITE: expected.cost.white, Color.BLUE: expected.cost.blue, Color.GREEN: expected.cost.green, Color.RED: expected.cost.red, Color.BLACK: expected.cost.black, Color.GOLD: 0}
         
-        game.purchaseCard(player, deckKey, cardIdx, gems)
-        actualPlayer:Player = game.players[0] 
+        game.purchaseCard(player, deckKey, expected, gems)
+        actualPlayer: Player = game.players[0]
         
         #check that the card was transferred to the player
         self.assertEqual(1, len(actualPlayer.cards))
@@ -371,7 +368,18 @@ class TestGameState(TestGame):
         self.assertIn(expectedReplacement, game.availableResources.get(deckKey))
         
         pass
-    
+
+    def testWithdrawPlayerGems(self):
+        game: GameState = self.createGame()
+        player: Player = game.players.get(0)
+        # setup the player with enough gems for the purchase
+        game.withdrawGems(player, {Color.WHITE: 1, Color.BLUE: 1, Color.GREEN: 1})
+        game.withdrawGems(player, {Color.WHITE: 1, Color.RED: 1, Color.BLACK: 1})
+
+        player.gems.withdrawTokens({Color.WHITE: 2})
+        self.assertDictEqual({Color.WHITE: 0, Color.BLUE: 1, Color.GREEN: 1, Color.RED: 1, Color.BLACK: 1, Color.GOLD: 0}, player.gems.tokens)
+        pass
+
     def testPurchaseCardUsingGold(self):
         
         game: GameState = self.createGame()
@@ -390,7 +398,7 @@ class TestGameState(TestGame):
         expectedReplacement: ResourceCard = game.resourceDeck.get(deckKey)[0]
         gems:TokenStore = {Color.WHITE: 0, Color.BLUE: expected.cost.blue, Color.GREEN: expected.cost.green, Color.RED: expected.cost.red, Color.BLACK: expected.cost.black, Color.GOLD: 1}
         
-        game.purchaseCard(player, deckKey, cardIdx, gems)
+        game.purchaseCard(player, deckKey, expected, gems)
         actualPlayer:Player = game.players[0] 
         
         #check that the card was transferred to the player
@@ -425,7 +433,7 @@ class TestGameState(TestGame):
         gems:dict = {Color.WHITE: expected.cost.white, Color.BLUE: expected.cost.blue, Color.GREEN: expected.cost.green, Color.RED: expected.cost.red, Color.BLACK: expected.cost.black, Color.GOLD: 0}
         
         with self.assertRaises(RuntimeError) as context:
-            game.purchaseCard(player, deckKey, cardIdx, gems)
+            game.purchaseCard(player, deckKey, expected, gems)
         self.assertEqual("Cannot remove more gems than are in the store.", str(context.exception))
         pass
     

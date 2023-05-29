@@ -8,6 +8,9 @@ import os
 from pynput.keyboard import Listener 
 
 from itertools import cycle
+
+import ResourceCard
+import TokenStore
 from GameState import GameState
 from Player import Player
 from typing import Iterable
@@ -91,10 +94,9 @@ class GameActions(object):
         for x, y in enumerate(self.game.availableNobles):
             print(f"Noble {x}: {y}")
             
-    def withdrawGems(self, gems):
+    def withdrawGems(self, gems: dict):
         self.game.withdrawGems(self.currentPlayer, gems)
         
-    def purchaseCard(self):
-        pass
-
+    def purchaseCard(self, deck: int, card: ResourceCard, gems: TokenStore):
+        self.game.purchaseCard(self.currentPlayer, deck, card, gems)
     

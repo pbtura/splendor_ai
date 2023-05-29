@@ -18,23 +18,23 @@ from Player import Player
 from GemCollection import GemCollection
 from numpy import ndarray
 
+
 class GameState(object):
     '''
     classdocs
     '''
 
-
-    players: Iterable[Player]
-    availableGems:TokenStore
-    availableNobles:Iterable[NobleCard]
-    noblesDeck:deque[NobleCard]
+    players: list[Player]
+    availableGems: TokenStore
+    availableNobles: Iterable[NobleCard]
+    noblesDeck: deque[NobleCard]
     
-    availableResources:dict[int,ndarray[ResourceCard]]
-    resourceDeck:dict[int, deque[ResourceCard]]
+    availableResources: dict[int,ndarray[ResourceCard]]
+    resourceDeck: dict[int, deque[ResourceCard]]
     
-    playersRandomized:bool = 0
-    resourcesShuffled:bool = 0
-    noblesShuffled:bool = 0
+    playersRandomized: bool = 0
+    resourcesShuffled: bool = 0
+    noblesShuffled: bool = 0
     
     def __init__(self, cardsPath: str, noblesPath: str):
         '''
@@ -87,7 +87,7 @@ class GameState(object):
     def addPlayers(self, names:list[str]):
         self.players = []
         for name in names:
-            player:Player = Player(name)
+            player: Player = Player(name)
             self.players.append(player)
                 
     def initializeResourceDecks(self):  
@@ -104,7 +104,7 @@ class GameState(object):
             self.noblesDeck = GameState.importNobleDeck(reader)
     
     def dealResourceCards(self, level: int, numberOfCards: int):
-        available:list = self.availableResources.get(level)
+        available: list = self.availableResources.get(level)
 
         i: int = 0;
         cards: deque = self.resourceDeck.get(level)
@@ -192,9 +192,9 @@ class GameState(object):
         self.availableGems.withdrawTokens(gems);
         player.gems.depositTokens(gems)       
     
-    def purchaseCard(self, player: Player, deck: int, cardIdx: int, gems: TokenStore):
+    def purchaseCard(self, player: Player, deck: int, card: ResourceCard, gems: dict):
         
-        card: ResourceCard = self.availableResources.get(deck).pop(cardIdx)
+        self.availableResources.get(deck).remove(card)
         replacementCard: ResourceCard = self.resourceDeck.get(deck).popleft()
               
         #transfer the gems from the player to the bank
@@ -208,7 +208,7 @@ class GameState(object):
         self.availableResources.get(deck).append(replacementCard)
         # print(self.availableResources)
         
-    def reserveCard(self, player:Player, deck: int, cardIdx: int):   
+    def reserveCard(self, player: Player, deck: int, cardIdx: int):
         
         #check how many reserved cards the player currently has
         if( len(player.reservedCards) >= 3):
