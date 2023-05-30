@@ -47,6 +47,6 @@ class Player(object):
         
         return total
 
-    def __str__(self)->str:
+    def __str__(self) -> str:
         return f"name:{self.name}, turns taken:{self.turnsTaken}, gems:{self.gems}, resources:{self.cards}, reserved cards:{self.reservedCards}, nobles:{self.nobles}"
         

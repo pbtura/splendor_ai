@@ -102,4 +102,7 @@ class GameActions(object):
 
     def reserveCard(self, deck: int, card: ResourceCard):
         self.game.reserveCard(self.currentPlayer, deck, card)
+
+    def endTurn(self):
+        self.currentPlayer = next(self.players)
     

@@ -92,6 +92,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
         self.purchaseCardButton.clicked.connect(self.purchaseButtonClicked)
         self.reserveCardButton.clicked.connect(self.reserveCardButtonClicked)
 
+        # setup the end turn button
+        self.endTurnButton.clicked.connect(self.handleEndTurnClicked)
+
         self.updatePlayerData()
 
     @property
@@ -205,6 +208,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
             errorDialog = QtWidgets.QErrorMessage(parent)
             errorDialog.showMessage(str(e))
 
+    def handleEndTurnClicked(self):
+        self.gameActions.endTurn()
+        self.updatePlayerData()
 
 if QtCore.QT_VERSION >= 0x50501:
     def excepthook(type_, value, traceback_):
