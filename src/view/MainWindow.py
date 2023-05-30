@@ -33,6 +33,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
     _headers = [Color.WHITE, Color.BLUE, Color.GREEN, Color.RED, Color.BLACK]
     _playerCardsModel: ResourceCardModel
     _selectedCard: ResourceCard
+    _reservedCard: ResourceCard
     tokenModel: TokenStoreModel
 
     def __init__(self, *args, obj=None, **kwargs):
@@ -66,8 +67,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
         self.playerGemsTable.setModel(self._playerGemModel)
 
         self.cards = self.gameActions.game.availableResources
-        self.purchaseCardButton.setEnabled(0)
-        self.reserveCardButton.setEnabled(0)
+        self.purchaseCardButton.setEnabled(False)
+        self.reserveCardButton.setEnabled(False)
+        self.purchaseReservedButton.setEnabled(False)
 
         self.lvOneModel = ResourceCardModel(self.cards.get(1))
         self.lvTwoModel = ResourceCardModel(self.cards.get(2))
@@ -88,6 +90,14 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
         self.lvThreeCardsTable.clicked.connect(
             lambda index, model=self.lvThreeModel: self.resourceCardSelected(index, model))
 
+        #setup the reserved cards table
+        reservedCardsModel = ResourceCardModel(self.gameActions.currentPlayer.reservedCards)
+        self.reservedCardsTable.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
+        self.reservedCardsTable.setModel(reservedCardsModel)
+        self.reservedCardsTable.clicked.connect(lambda index, model=reservedCardsModel: self.reservedCardSelected(index, model))
+
+        self.purchaseReservedButton.clicked.connect(self.claimReservedClicked)
+
         # setup the purchase and reserve buttons
         self.purchaseCardButton.clicked.connect(self.purchaseButtonClicked)
         self.reserveCardButton.clicked.connect(self.reserveCardButtonClicked)
@@ -106,11 +116,24 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
         self._selectedCard = card
         # enable/disable the purchase and reserve buttons here
         if card is None:
-            self.purchaseCardButton.setEnabled(0)
-            self.reserveCardButton.setEnabled(0)
+            self.purchaseCardButton.setEnabled(False)
+            self.reserveCardButton.setEnabled(False)
         else:
-            self.purchaseCardButton.setEnabled(1)
-            self.reserveCardButton.setEnabled(1)
+            self.purchaseCardButton.setEnabled(True)
+            self.reserveCardButton.setEnabled(True)
+
+    @property
+    def reservedCard(self) -> ResourceCard:
+        return self._reservedCard
+
+    @reservedCard.setter
+    def reservedCard(self, card: ResourceCard):
+        self._reservedCard = card
+        # enable/disable the purchase and reserve buttons here
+        if card is None:
+            self.purchaseReservedButton.setEnabled(False)
+        else:
+            self.purchaseReservedButton.setEnabled(True)
 
     def resourceCardSelected(self, item: QModelIndex, model: ResourceCardModel):
         modifiers = QtWidgets.QApplication.keyboardModifiers()
@@ -122,12 +145,22 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
             # msgDialog.setText(str(self.selectedCard))
             # msgDialog.show()
 
+    def reservedCardSelected(self, item: QModelIndex, model: ResourceCardModel):
+        modifiers = QtWidgets.QApplication.keyboardModifiers()
+        if modifiers == QtCore.Qt.ControlModifier:
+            self.reservedCard = None
+        else:
+            self.reservedCard = model.getRow(item, Qt.UserRole)
+
     def purchaseButtonClicked(self):
         self.openPurchaseCardDialog(self.selectedCard)
 
     def reserveCardButtonClicked(self):
         self.gameActions.reserveCard(self.selectedCard.level, self.selectedCard)
         self.updatePlayerData()
+
+    def claimReservedClicked(self):
+        self.openClaimCardDialog(self.reservedCard)
 
     def updatePlayerData(self):
         player = self.gameActions.currentPlayer
@@ -137,6 +170,9 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
         self.purchasedCardsTable.setModel(self._playerCardsModel)
         self.reservedCardsTable.setModel(ResourceCardModel(player.reservedCards))
         self.refreshPlayerGems()
+        self.purchaseCardButton.setEnabled(False)
+        self.reserveCardButton.setEnabled(False)
+        self.purchaseReservedButton.setEnabled(False)
 
     def refreshPlayerGems(self):
         data: list = [["Currently held", self.gameActions.currentPlayer.gems]]
@@ -201,6 +237,37 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
 
         try:
             self.gameActions.purchaseCard(self.selectedCard.level, self.selectedCard, gems)
+            parent.close()
+            self.updatePlayerData()
+        except RuntimeError as e:
+            print(e)
+            errorDialog = QtWidgets.QErrorMessage(parent)
+            errorDialog.showMessage(str(e))
+
+    def openClaimCardDialog(self, card: ResourceCard) -> None:
+        bank = self.gameActions.game.availableGems
+
+        currentPlayer = self.gameActions.currentPlayer
+
+        data: list = [["Card cost:", card.cost.getAsTokens()],
+                      ["Currently held", currentPlayer.gems], ["gems to pay", TokenStore(0, 0, 0, 0, 0, 0)]]
+
+        self.tokenModel = TokenStoreModel(data, self._headers, [0, 0, 1])
+
+        dlg = GemDialog(self)
+        dlg.save.connect(self.handleCardClaimed)
+        dlg.exec()
+
+    def handleCardClaimed(self, parent):
+        gems = {}
+        for x, y in enumerate(self._headers):
+            index: QModelIndex = self.tokenModel.index(2, x)
+            model = index.data(Qt.EditRole)
+            # print(f"{y}:{model}")
+            gems[y] = model
+
+        try:
+            self.gameActions.claimReservedCard(self.selectedCard, gems)
             parent.close()
             self.updatePlayerData()
         except RuntimeError as e:

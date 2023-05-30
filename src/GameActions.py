@@ -3,6 +3,8 @@ Created on Apr 14, 2023
 
 @author: bucpa
 '''
+from collections import OrderedDict
+
 import numpy as np
 import os
 from pynput.keyboard import Listener 
@@ -102,6 +104,9 @@ class GameActions(object):
 
     def reserveCard(self, deck: int, card: ResourceCard):
         self.game.reserveCard(self.currentPlayer, deck, card)
+
+    def claimReservedCard(self, card: ResourceCard, gems: OrderedDict):
+        self.game.claimReservedCard(self.currentPlayer, card, gems)
 
     def endTurn(self):
         self.currentPlayer = next(self.players)

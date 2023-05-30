@@ -5,7 +5,7 @@ Created on Apr 11, 2023
 '''
 import csv
 import random
-from collections import deque
+from collections import deque, OrderedDict
 import numpy as np
 
 from Cost import Cost
@@ -229,11 +229,9 @@ class GameState(object):
          
         # print("reserving card")  
     
-    def claimReservedCard(self, player:Player, cardIdx, gems:TokenStore):
-        if( len(player.reservedCards) < cardIdx):
-            raise RuntimeError("The requested card index is out of bounds.")
-        
-        card:ResourceCard = player.reservedCards.pop(cardIdx)
+    def claimReservedCard(self, player: Player, card: ResourceCard, gems: OrderedDict):
+
+        player.reservedCards.remove(card)
         #transfer the gems from the player to the bank
         player.gems.withdrawTokens(gems)
         self.availableGems.depositTokens(gems)

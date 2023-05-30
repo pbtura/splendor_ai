@@ -507,7 +507,7 @@ class TestGameState(TestGame):
         game.reserveCard(player, deckKey, expected)
         
         #claim the reserved card
-        game.claimReservedCard(player, cardIdx, gems)
+        game.claimReservedCard(player, expected, gems)
         
         #check that the correct amount of gems were transfered from the player to the bank
         self.assertDictEqual({Color.WHITE: 1, Color.BLUE: 0, Color.GREEN: 0, Color.RED: 0, Color.BLACK: 1, Color.GOLD: 1}, player.gems.tokens)
