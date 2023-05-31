@@ -1,3 +1,5 @@
 python -m PyQt5.uic.pyuic -x C:\Users\bucpa\OneDrive\Documents\eclipse\workspace\splendor_ai\splendor_ui\form.ui -o C:\Users\bucpa\OneDrive\Documents\eclipse\workspace\splendor_ai\splendor_ai\src\view\mainform.py
 
 python -m PyQt5.uic.pyuic -x C:\Users\bucpa\OneDrive\Documents\eclipse\workspace\splendor_ai\splendor_ui\gem_dialog.ui -o C:\Users\bucpa\OneDrive\Documents\eclipse\workspace\splendor_ai\splendor_ai\src\view\gem_dialog.py
+
+python -m PyQt5.uic.pyuic -x C:\Users\bucpa\OneDrive\Documents\eclipse\workspace\splendor_ai\splendor_ui\noble_dialog.ui -o C:\Users\bucpa\OneDrive\Documents\eclipse\workspace\splendor_ai\splendor_ai\src\view\noble_dialog.py
