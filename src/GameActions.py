@@ -98,9 +98,9 @@ class GameActions(object):
         print(f"LV 2: {self.game.availableResources.get(2)[0]} | {self.game.availableResources.get(2)[1] } | {self.game.availableResources.get(2)[2]} | {self.game.availableResources.get(2)[3]}" )
         print(f"LV 3: {self.game.availableResources.get(3)[0]} | {self.game.availableResources.get(3)[1] } | {self.game.availableResources.get(3)[2]} | {self.game.availableResources.get(3)[3]}" )
         
-    def listAvailableNobles(self):
-        for x, y in enumerate(self.game.availableNobles):
-            print(f"Noble {x}: {y}")
+    # def listAvailableNobles(self):
+    #     for x, y in enumerate(self.game.availableNobles):
+    #         print(f"Noble {x}: {y}")
             
     def withdrawGems(self, gems: dict):
         self.game.withdrawGems(self.currentPlayer, gems)

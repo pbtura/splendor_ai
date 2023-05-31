@@ -11,11 +11,11 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_GemDialog(object):
-    def setupUi(self, GemDialog):
-        GemDialog.setObjectName("GemDialog")
-        GemDialog.resize(1268, 547)
-        self.layoutWidget = QtWidgets.QWidget(GemDialog)
+class Ui_NobleDialog(object):
+    def setupUi(self, NobleDialog):
+        NobleDialog.setObjectName("NobleDialog")
+        NobleDialog.resize(1268, 547)
+        self.layoutWidget = QtWidgets.QWidget(NobleDialog)
         self.layoutWidget.setGeometry(QtCore.QRect(20, 20, 1171, 355))
         self.layoutWidget.setObjectName("layoutWidget")
         self.verticalLayout_7 = QtWidgets.QVBoxLayout(self.layoutWidget)
@@ -39,22 +39,22 @@ class Ui_GemDialog(object):
         self.nobleDialogButtons.setObjectName("nobleDialogButtons")
         self.verticalLayout_7.addWidget(self.nobleDialogButtons)
 
-        self.retranslateUi(GemDialog)
-        self.nobleDialogButtons.accepted.connect(GemDialog.accept) # type: ignore
-        self.nobleDialogButtons.rejected.connect(GemDialog.reject) # type: ignore
-        QtCore.QMetaObject.connectSlotsByName(GemDialog)
+        self.retranslateUi(NobleDialog)
+        self.nobleDialogButtons.accepted.connect(NobleDialog.accept) # type: ignore
+        self.nobleDialogButtons.rejected.connect(NobleDialog.reject) # type: ignore
+        QtCore.QMetaObject.connectSlotsByName(NobleDialog)
 
-    def retranslateUi(self, GemDialog):
+    def retranslateUi(self, NobleDialog):
         _translate = QtCore.QCoreApplication.translate
-        GemDialog.setWindowTitle(_translate("GemDialog", "Dialog"))
-        self.label_6.setText(_translate("GemDialog", "Available Nobles"))
+        NobleDialog.setWindowTitle(_translate("NobleDialog", "Dialog"))
+        self.label_6.setText(_translate("NobleDialog", "Available Nobles"))
 
 
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    GemDialog = QtWidgets.QDialog()
-    ui = Ui_GemDialog()
-    ui.setupUi(GemDialog)
-    GemDialog.show()
+    NobleDialog = QtWidgets.QDialog()
+    ui = Ui_NobleDialog()
+    ui.setupUi(NobleDialog)
+    NobleDialog.show()
     sys.exit(app.exec_())

@@ -24,6 +24,7 @@ from view.model.ResourceCardModel import ResourceCardModel
 from PyQt5.Qt import QModelIndex, pyqtSignal, QObject, QAbstractItemView
 
 from view.mainform import Ui_Widget
+from view.widgets.NobleDialog import NobleDialog
 
 
 class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
@@ -36,6 +37,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
     _selectedCard: ResourceCard
     _reservedCard: ResourceCard
     tokenModel: TokenStoreModel
+    affordableNobles: NobleCardModel
 
     def __init__(self, *args, obj=None, **kwargs):
         '''
@@ -282,9 +284,32 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
             errorDialog = QtWidgets.QErrorMessage(parent)
             errorDialog.showMessage(str(e))
 
+    def openAffordableNoblesDialog(self):
+        dlg = NobleDialog(self)
+        dlg.save.connect(self.handleNoblesClaimed)
+        dlg.exec()
+
+    def handleNoblesClaimed(self, parent):
+
+        try:
+            # self.gameActions.purchaseCard(self.selectedCard.level, self.selectedCard, gems)
+            parent.close()
+            self.gameActions.endTurn()
+            self.updatePlayerData()
+        except RuntimeError as e:
+            print(e)
+            errorDialog = QtWidgets.QErrorMessage(parent)
+            errorDialog.showMessage(str(e))
+
     def handleEndTurnClicked(self):
-        self.gameActions.endTurn()
-        self.updatePlayerData()
+
+        nobles: list = self.gameActions.findAffordableNobles()
+        if len(list) > 0:
+            self.availableNoblesModel = NobleCardModel(nobles)
+            self.openAffordableNoblesDialog()
+        else:
+            self.gameActions.endTurn()
+            self.updatePlayerData()
 
 if QtCore.QT_VERSION >= 0x50501:
     def excepthook(type_, value, traceback_):
