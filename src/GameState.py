@@ -239,14 +239,13 @@ class GameState(object):
         # move the card from reserved to claimed
         player.cards.append(card)
 
-    def claimNoble(self, player: Player, cardIdx: int):
+    def claimNoble(self, player: Player, card: NobleCard):
 
-        card: NobleCard = self.availableNobles[cardIdx]
         totals: dict = player.getResourceTotals()
         if (card.cost.white <= totals.get(Color.WHITE) and card.cost.blue <= totals.get(Color.BLUE)
                 and card.cost.green <= totals.get(Color.GREEN) and card.cost.red <= totals.get(
                     Color.RED) and card.cost.black <= totals.get(Color.BLACK)):
-            self.availableNobles.pop(cardIdx)
+            self.availableNobles.remove(card)
             player.nobles.append(card)
         else:
             raise RuntimeError("Not enough resource cards to claim a noble.")

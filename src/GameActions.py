@@ -7,16 +7,21 @@ from collections import OrderedDict
 
 import numpy as np
 import os
+
+from numpy import ndarray
 from pynput.keyboard import Listener 
 
 from itertools import cycle
 
 import ResourceCard
 import TokenStore
+from Color import Color
 from GameState import GameState
 from NobleCard import NobleCard
 from Player import Player
-from typing import Iterable
+from typing import Iterable, Dict
+
+from ResourceCard import ResourceCard
 
 
 class GameActions(object):
@@ -109,9 +114,28 @@ class GameActions(object):
     def claimReservedCard(self, card: ResourceCard, gems: OrderedDict):
         self.game.claimReservedCard(self.currentPlayer, card, gems)
 
+    def claimNoble(self, card: NobleCard):
+        self.game.claimNoble(self.currentPlayer, card)
+
     def endTurn(self):
         self.currentPlayer = next(self.players)
 
     @property
     def availableNobles(self) -> list[NobleCard]:
         return self.game.availableNobles
+
+    @property
+    def availableResourceCards(self) -> dict[int, ndarray[ResourceCard]]:
+        return self.game.availableResources
+
+    def findAffordableNobles(self) -> list[NobleCard]:
+        player = self.currentPlayer
+        totals: dict = player.getResourceTotals()
+        found: list[NobleCard] = []
+        for card in self.availableNobles:
+            if (card.cost.white <= totals.get(Color.WHITE) and card.cost.blue <= totals.get(Color.BLUE)
+                    and card.cost.green <= totals.get(Color.GREEN) and card.cost.red <= totals.get(
+                        Color.RED) and card.cost.black <= totals.get(Color.BLACK)):
+                found.append(card)
+
+        return found
