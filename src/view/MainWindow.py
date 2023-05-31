@@ -179,6 +179,7 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
         self.purchaseCardButton.setEnabled(False)
         self.reserveCardButton.setEnabled(False)
         self.purchaseReservedButton.setEnabled(False)
+        self.claimedNoblesTable.setModel(NobleCardModel(player.nobles))
 
     def refreshPlayerGems(self):
         data: list = [["Currently held", self.gameActions.currentPlayer.gems]]
