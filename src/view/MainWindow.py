@@ -11,6 +11,7 @@ from PyQt5.QtWidgets import QDialog
 
 from GameActions import GameActions
 from view.gem_dialog import Ui_Dialog
+from view.model.NobleCardModel import NobleCardModel
 from view.model.PlayerList import PlayerList
 from view.widgets.GemDialog import GemDialog
 from view.widgets.GemTableView import GemTableView
@@ -52,7 +53,8 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
 
         headersList = self._headers
         headersList.append(Color.GOLD)
-        #initialize the gems bank
+
+        # initialize the gems bank
         bank = self.gameActions.game.availableGems
         data: list = [["gems available", bank]]
 
@@ -90,7 +92,11 @@ class MainWindow(QtWidgets.QMainWindow, Ui_Widget):
         self.lvThreeCardsTable.clicked.connect(
             lambda index, model=self.lvThreeModel: self.resourceCardSelected(index, model))
 
-        #setup the reserved cards table
+        # setup the available nobles table
+        self.availableNoblesModel = NobleCardModel(self.gameActions.availableNobles)
+        self.availableNoblesTable.setModel(self.availableNoblesModel)
+
+        # setup the reserved cards table
         reservedCardsModel = ResourceCardModel(self.gameActions.currentPlayer.reservedCards)
         self.reservedCardsTable.setSelectionBehavior(QtWidgets.QTableView.SelectRows)
         self.reservedCardsTable.setModel(reservedCardsModel)
