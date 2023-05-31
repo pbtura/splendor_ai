@@ -14,26 +14,26 @@ class TokenStore(GemCollection):
     classdocs
     '''
 
-    tokens: OrderedDict[str, int]
+    tokens: OrderedDict[Color, int]
     
     def __init__(self, white: int, blue: int, green: int, red: int, black: int, gold: int):
         '''
         Constructor
         '''
-        self.tokens = {Color.WHITE: white, Color.BLUE: blue, Color.GREEN: green, Color.RED: red, Color.BLACK: black, Color.GOLD: gold}
+        self.tokens = OrderedDict({Color.WHITE: white, Color.BLUE: blue, Color.GREEN: green, Color.RED: red, Color.BLACK: black, Color.GOLD: gold})
     
-    def getValues(self)->list:
+    def getValues(self) -> np.ndarray:
         return np.array(list(self.tokens.values()))
     
-    def depositTokens(self, tokens:OrderedDict[str, int])-> bool:
-        for x,y in tokens.items():
+    def depositTokens(self, tokens: OrderedDict[Color, int]) -> bool:
+        for x, y in tokens.items():
             self.tokens[x] += y
     
         return True
     
-    def withdrawTokens(self, tokens:OrderedDict[str, int])-> bool:
-        for x,y in tokens.items():              
-            if( self.validateWithdraw(self.tokens[x], y, x) ):
+    def withdrawTokens(self, tokens: OrderedDict[Color, int]) -> bool:
+        for x, y in tokens.items():
+            if self.validateWithdraw(self.tokens[x], y, x):
                 self.tokens[x] -= y
             else:
                 return False
@@ -43,18 +43,17 @@ class TokenStore(GemCollection):
     def validateWithdrawPair(self, color: Color) -> bool:
         if self.tokens.get(color) < 4:
             raise RuntimeError("Cannot withdraw two matched gems when less than four remain.")
-            return False
         else:
             return True
         
-    def validateWithdraw(self, old, new, color: Color)->bool:
+    def validateWithdraw(self, old, new, color: Color) -> bool:
 
-        if(new >= 2):
+        if new >= 2:
             self.validateWithdrawPair(color)
-        if(old - new < 0):
+        if old - new < 0:
             raise RuntimeError("Cannot remove more gems than are in the store.") 
         else:
             return True
         
-    def __str__(self)->str:
+    def __str__(self) -> str:
         return f"{self.tokens}"

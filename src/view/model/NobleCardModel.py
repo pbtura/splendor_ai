@@ -7,47 +7,44 @@ from typing import Any
 
 from PyQt5 import QtCore
 from PyQt5.QtCore import Qt, QModelIndex
-from ResourceCard import ResourceCard
+
+from NobleCard import NobleCard
 
 
-class ResourceCardModel(QtCore.QAbstractTableModel):
+class NobleCardModel(QtCore.QAbstractTableModel):
     '''
     classdocs
     '''
-    _headers = ["Level", "Color", "Points", "Cost"]
+    _headers = ["Points", "Cost"]
 
-    def __init__(self, cards: list[ResourceCard]):
+    def __init__(self, cards: list[NobleCard]):
         '''
         Constructor
         '''
-        super(ResourceCardModel, self).__init__()
+        super(NobleCardModel, self).__init__()
         self._data = cards
     
     def data(self, index: QModelIndex, role: int = ...) -> Any:
         column = index.column()
         row = index.row()
-        item: ResourceCard = self._data[row]
+        item: NobleCard = self._data[row]
         
         if role == Qt.DisplayRole or role == Qt.EditRole:            
             
             match column: 
                 case 0:
-                    return str(item.level)
-                case 1:
-                    return str(item.suit.name)
-                case 2:
                     return str(item.points)
-                case 3:
+                case 1:
                     return str(item.cost)
                 case _:
                     return ""
 
     def getRow(self, index, role):
         row = index.row()
-        item: ResourceCard = self._data[row]
+        item: NobleCard = self._data[row]
         
         if role == Qt.DisplayRole or role == Qt.EditRole:                       
-            return [str(item.level), str(item.suit.name), str(item.points), str(item.cost)]
+            return [str(item.points), str(item.cost)]
                 
         elif role == Qt.UserRole:
             return item

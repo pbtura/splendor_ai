@@ -17,7 +17,7 @@ class Player(object):
     gems: PlayerTokenStore
     cards: list[ResourceCard]
     reservedCards: list[ResourceCard]
-    nobles: Iterable[NobleCard]
+    nobles: list[NobleCard]
     
     def __init__(self, playerName: str):
         '''
@@ -32,7 +32,7 @@ class Player(object):
         
     def getResourceTotals(self) -> OrderedDict[Color, int]:
         card: ResourceCard
-        totals: OrderedDict={Color.WHITE: 0, Color.BLUE: 0, Color.GREEN: 0, Color.RED: 0, Color.BLACK: 0}
+        totals: OrderedDict = {Color.WHITE: 0, Color.BLUE: 0, Color.GREEN: 0, Color.RED: 0, Color.BLACK: 0}
         for card in self.cards:
             t = totals.get(card.suit) + 1
             totals[card.suit] = t

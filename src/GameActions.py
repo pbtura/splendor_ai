@@ -14,6 +14,7 @@ from itertools import cycle
 import ResourceCard
 import TokenStore
 from GameState import GameState
+from NobleCard import NobleCard
 from Player import Player
 from typing import Iterable
 
@@ -110,4 +111,7 @@ class GameActions(object):
 
     def endTurn(self):
         self.currentPlayer = next(self.players)
-    
+
+    @property
+    def availableNobles(self) -> list[NobleCard]:
+        return self.game.availableNobles
