@@ -29,7 +29,7 @@ class GameState(object):
     availableNobles: list[NobleCard]
     noblesDeck: deque[NobleCard]
 
-    availableResources: dict[int, ndarray[ResourceCard]]
+    availableResources: dict[int, list[ResourceCard]]
     resourceDeck: dict[int, deque[ResourceCard]]
 
     playersRandomized: bool = 0

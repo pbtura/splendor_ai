@@ -9,7 +9,6 @@ import numpy as np
 import os
 
 from numpy import ndarray
-from pynput.keyboard import Listener 
 
 from itertools import cycle
 
@@ -32,10 +31,8 @@ class GameActions(object):
     game: GameState
     players: cycle
     currentPlayer: Player
-    listener: Listener
-    listening: bool = 0
-   
-    def __init__(self, names: Iterable[str], randomize: bool = 1, cardsPath: str = os.path.join('..', '..', 'resources', 'cards_list.csv'), noblesPath: str = os.path.join('..','..','resources','nobles_list.csv')):
+
+    def __init__(self, names: list[str], randomize: bool = 1, cardsPath: str = os.path.join('..', '..', 'resources', 'cards_list.csv'), noblesPath: str = os.path.join('..','..','resources','nobles_list.csv')):
         '''
         Constructor
         '''
@@ -44,44 +41,11 @@ class GameActions(object):
         self.game.startNewGame(randomize)
         self.players = cycle(self.game.players)
         self.currentPlayer = next(self.players)
-        # self.listener = Listener(
-        #     on_press = self.on_press
-        # )
-        
+
     def getPlayersList(self)->list:
         return self.game.players
-    
-    def promptUser(self):
-        print("Choose an action: 1)list available cards, 2)take gems, 3)buy card, 4)reserve card 5)list affordable cards q)end turn 0)cancel  ")
-        self.listener.start()
-        self.listener.join()
-
-    def on_press(self,key):
-        print("Key pressed: {0}".format(key))
-        if hasattr(key, 'char'):  # Write the character pressed if available
-             
-            match key.char:
-                case '1':
-                    print(f"pressed {key.char}")
-                    self.listAvailableResources()
-                case '2':
-                    pass
-                case '3':
-                    pass
-                case '4':
-                    pass
-                case '5':
-                    cards = self.findAffordableCards()
-                    print(cards)
-                case 'q':
-                    self.takeTurn()
-                case _:
-                    pass
 
     def takeTurn(self):
-        if not self.listening:
-            self.listening = True
-            self.promptUser()
         self.currentPlayer = next(self.players)
         print(f"player {self.currentPlayer.name}, it is your turn")
     
@@ -102,9 +66,9 @@ class GameActions(object):
     #     for x, y in enumerate(self.game.availableNobles):
     #         print(f"Noble {x}: {y}")
             
-    def withdrawGems(self, gems: dict):
+    def withdrawGems(self, gems: OrderedDict):
         self.game.withdrawGems(self.currentPlayer, gems)
-        
+
     def purchaseCard(self, deck: int, card: ResourceCard, gems: TokenStore):
         self.game.purchaseCard(self.currentPlayer, deck, card, gems)
 

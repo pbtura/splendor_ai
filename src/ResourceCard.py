@@ -4,7 +4,6 @@ Created on Apr 11, 2023
 @author: bucpa
 '''
 import numpy as np
-import pynput
 from Color import Color
 from Cost import Cost
 

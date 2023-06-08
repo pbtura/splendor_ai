@@ -567,7 +567,7 @@ class TestGameState(TestGame):
             player.cards.append(card2)
             idx += 1
 
-        game.claimNoble(player, cardIdx)
+        game.claimNoble(player, expected)
 
         self.assertEqual(4, len(game.availableNobles))
         self.assertEqual(1, len(player.nobles))
@@ -579,7 +579,7 @@ class TestGameState(TestGame):
 
         game: GameState = self.createGame()
         player: Player = game.players[0]
-        cardIdx: int = 0
+        expected: NobleCard = game.availableNobles[0]
 
         card1: ResourceCard = game.resourceDeck.get(3)[9]
 
@@ -589,10 +589,8 @@ class TestGameState(TestGame):
         # 3    0        0       4        4      0       
 
         with self.assertRaises(RuntimeError) as context:
-            game.claimNoble(player, cardIdx)
+            game.claimNoble(player, expected)
         self.assertEqual("Not enough resource cards to claim a noble.", str(context.exception))
-
-        pass
 
     def testIsCardAffordable(self):
         game: GameState = self.createGame()
@@ -616,8 +614,6 @@ class TestGameState(TestGame):
         # print(card)
 
         self.assertTrue(GameState.canPurchase(card.cost, player.gems, list(player.getResourceTotals().values())))
-
-        pass
 
     def testIsCardNotAffordable(self):
         game: GameState = self.createGame()

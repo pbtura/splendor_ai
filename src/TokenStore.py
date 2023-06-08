@@ -16,7 +16,7 @@ class TokenStore(GemCollection):
 
     tokens: OrderedDict[Color, int]
     
-    def __init__(self, white: int, blue: int, green: int, red: int, black: int, gold: int):
+    def __init__(self, white: int, blue: int, green: int, red: int, black: int, gold: int = 0):
         '''
         Constructor
         '''

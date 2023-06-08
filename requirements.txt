@@ -1,4 +1,10 @@
+certifi==2023.5.7
+munkres==1.1.4
+ply==3.11
+PyQt5==5.15.7
+torch==2.0.1
+torchaudio==2.0.2
+torchvision==0.15.2
+matplotlib
+IPython
 numpy
-pynput
-pyqt5-tools
-PyQt5
